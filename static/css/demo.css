@@ -1,0 +1,66 @@
+.progress {
+    height: 32px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    -moz-background-size: 100% 100%;
+}
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+p {
+    margin-top: 30px;
+    margin-left: 20px;
+    color: azure
+}
+
+input {
+    margin-left: 15px;
+    border-radius: 5px;
+    border-style: hidden;
+    height: 30px;
+    width: 200px;
+    background-color: whitesmoke;
+    outline: none;
+    padding-left: 10px;
+    font-size: large;
+}
+
+textarea {
+    resize: none;
+    margin-left: 15px;
+    border-radius: 5px;
+    border-style: hidden;
+    background-color: whitesmoke;
+    outline: none;
+    padding-left: 10px;
+    font-size: x-large;
+}
+
+.button {
+    border-color: cornsilk;
+    background-color: rgba(100, 149, 237, .7);
+    color: aliceblue;
+    border-style: hidden;
+    border-radius: 5px;
+    width: 110px;
+    height: 32px;
+    font-size: 20px;
+}

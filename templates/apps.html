@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <title>All apps</title>
+    <link rel="stylesheet" href="../static/css/style.css" />
+    <link rel="stylesheet" href="../static/css/fonts.css" />
+    <style>
+        #URLText {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            z-index: -10;
+        }
+    </style>
+    <script type="text/javascript">
+        function copyURL(app_id) {
+            var text = document.getElementById("URL_" + app_id).innerText;
+            var input = document.getElementById("URLText");
+            input.value = text;
+            input.select();//选中文本
+            //执行浏览器复制命令
+            if(document.execCommand("copy")) {
+                alert("复制成功");
+            }
+        }
+    </script>
+</head>
+
+<body>
+<input type="text" id="URLText">
+{% extends 'base.html' %}
+{% block content %}
+    <main class="">
+        <p>Below is a list of books written with <strong>bookdown</strong>, including those published to bookdown.org (books without substantial content are excluded) and a few hosted on external servers. The books are ordered roughly by date. An asterisk <code>*</code> after a date indicates the date is unknown, which often means a <code>date</code> field is missing in the YAML metadata of the source document <code>index.Rmd</code>. The list of books is automatically generated. For more information (including how to add or remove your books on this page), please see the <a href="../about">About</a> page.</p>
+
+        <div class="item-list" id="itemlist">
+            {% for app_id in app_dict %}
+                <section class="article-list" style="background: linear-gradient(to top, #75aadb, white 6.7%);">
+                    <h1>{{ app_dict[app_id].app_name }}</h1>
+                    <h2 class="list-meta" style="font-size: 1em;">
+                        <span>by {{ app_dict[app_id].app_author }}</span>
+                        <span>{{ app_dict[app_id].app_date }}</span>
+                    </h2>
+                    <div class="list-meta" style="border-bottom: 1px solid #ddd">
+                        <span>Download URL:</span>
+                        <span id="URL_{{ app_id }}">{{ app_dict[app_id].app_url }}</span>
+                        <button onclick="copyURL({{ app_id }})">copy link</button>
+                    </div>
+                    <div class="summary">
+                        <p>{{ app_dict[app_id].app_summary }}</p>
+                    </div>
+                    <span class="book-number">{{ app_id }}</span>
+                </section>
+            {% endfor %}
+        </div>
+    </main>
+{% endblock content %}
+
+</body>
+</html>

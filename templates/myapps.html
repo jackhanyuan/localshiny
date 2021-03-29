@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <title>My apps</title>
+    <link rel="stylesheet" href="../static/css/style.css"/>
+    <link rel="stylesheet" href="../static/css/fonts.css"/>
+    <style>
+        .myButton {
+            border-color: cornsilk;
+            background-color: #71a5d4;
+            color: aliceblue;
+            border-style: hidden;
+            border-radius: 5px;
+            width: 100px;
+            height: 32px;
+            font-size: 20px;
+        }
+
+        .addButton {
+            border-color: cornsilk;
+            background-color: #71a5d4;
+            color: aliceblue;
+            border-style: hidden;
+            border-radius: 5px;
+            width: 100px;
+            height: 32px;
+            font-size: 20px;
+        }
+
+        #URLText {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            z-index: -10;
+        }
+    </style>
+    <script type="text/javascript">
+        function deleteFuc(app_id) {
+            if(confirm("Are you sure you want to delete this app?")) {
+                location.href = document.getElementById("delete_url" + app_id).value;
+            }
+        }
+
+        function copyURL(app_id) {
+            var text = document.getElementById("URL_" + app_id).innerText;
+            var input = document.getElementById("URLText");
+            input.value = text;
+            input.select();//选中文本
+            //执行浏览器复制命令
+            if(document.execCommand("copy")) {
+                alert("复制成功");
+            }
+        }
+    </script>
+</head>
+
+<body>
+<input type="text" id="URLText">
+{% extends 'base.html' %}
+{% block content %}
+    <main class="">
+
+        <p>Below is a list of books written with <strong>bookdown</strong>, including those published to bookdown.org
+            (books without substantial content are excluded) and a few hosted on external servers. The books are ordered
+            roughly by date. An asterisk <code>*</code> after a date indicates the date is unknown, which often means a
+            <code>date</code> field is missing in the YAML metadata of the source document <code>index.Rmd</code>. The
+            list of books is automatically generated. For more information (including how to add or remove your books on
+            this page), please see the <a href="../about/">About</a> page.</p>
+
+        {% if session.get('logged_in') != None %}
+            <div class="item-list">
+                <!--上传Package按钮，用户登录后显示-->
+                <button type="button" class="addButton" onclick="location.href='/upload'">new apps</button>
+            </div>
+        {% endif %}
+
+        <div class="item-list" id="itemlist">
+            {% for app_id in my_app_dict %}
+                <section class="article-list" style="background: linear-gradient(to top, #75aadb, white 6.7%);">
+                    <h1>{{ my_app_dict[app_id].app_name }}</h1>
+                    <input type="hidden" id="delete_url{{ app_id }}" value="/delete_app/{{ my_app_dict[app_id].app_name }}">
+                    <button type="button" class="myButton"
+                            id="deleteBtn" onclick="deleteFuc({{ app_id }});">delete
+                    </button>
+                    <button type="button" class="myButton"
+                            onclick="location.href='/update/{{ my_app_dict[app_id].app_name }}'">update
+                    </button>
+                    <h2 class="list-meta" style="font-size: 1em;">
+                        <span>by {{ my_app_dict[app_id].app_author }}</span>
+                        <span>{{ my_app_dict[app_id].app_date }}</span>
+                    </h2>
+                    <div class="list-meta" style="border-bottom: 1px solid #ddd">
+                        <span>Download URL:</span>
+                        <span id="URL_{{ app_id }}">{{ my_app_dict[app_id].app_url }}</span>
+                        <button onclick="copyURL({{ app_id }})">copy link</button>
+                    </div>
+                    <div class="summary">
+                        <p>{{ my_app_dict[app_id].app_summary }}</p>
+                    </div>
+                    <span class="book-number">{{ app_id }}</span>
+                </section>
+            {% endfor %}
+        </div>
+    </main>
+{% endblock content %}
+
+</body>
+</html>

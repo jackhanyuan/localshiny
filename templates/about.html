@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <title>About</title>
+    <link rel="stylesheet" href="../static/css/style.css" />
+    <link rel="stylesheet" href="../static/css/fonts.css" />
+</head>
+
+<body>
+
+{% extends 'base.html' %}
+{% block content %}
+    <div class="article-meta">
+        <h1><span class="title">About RShiny</span></h1>
+    </div>
+    <main class="single">
+        <p>The <a href="https://github.com/rstudio/bookdown"><strong>bookdown</strong></a> package is a free and open-source R package built on top of <a href="http://rmarkdown.rstudio.com">R Markdown</a> to make it really easy to write books and long-form articles/reports. Markdown is a very simple language but made powerful thanks to <a href="http://pandoc.org">Pandoc</a>, and <strong>bookdown</strong> has added a few important missing features related to writing books, such as figure/table caption numbering and cross-references, and embedding <a href="https://htmlwidgets.org">HTML widgets</a> or <a href="https://shiny.rstudio.com">Shiny apps</a>. We have tried hard to make everything work for all output formats (PDF, HTML, and EPUB, etc), so your readers can choose their favorite file format to read. Although the <strong>bookdown</strong> package was developed using R, it does not mean your book have to be related to R at all. You can certainly write poems or novels with <strong>bookdown</strong>!</p>
+        <h2 id="about-bookdownorg">About ...</h2>
+        <p>...</p>
+    </main>
+{% endblock content %}
+
+</body>
+</html>
