@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
+    <link rel="stylesheet" href="../static/css/style.css" />
+    <link rel="stylesheet" href="../static/css/fonts.css" />
     <link rel="icon" type="image/x-icon" href="/static/img/favicon.ico">
     <style>
         * {
@@ -69,7 +71,11 @@
         }
     </style>
 </head>
+
 <body>
+
+{#{% extends 'base.html' %}#}
+{#{% block content %}#}
     <div id="loginDiv">
         <form action="/login" id="form" method="post">
             <h1 style="text-align: center;color: aliceblue;">Log in</h1>
@@ -106,7 +112,7 @@
             </div>
         </form>
     </div>
-
+{#{% endblock content %}#}
 </body>
 </html>
 

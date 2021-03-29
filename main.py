@@ -6,7 +6,7 @@ import redis
 import shutil
 from tus.flask_tus import tus_manager
 from werkzeug.utils import secure_filename
-from database import get_db, user_register, verify_password, create_package_data, update_package_data, get_package_data, delete_package_data, create_temp_folder, del_file, get_token, verify_token, update_token
+from database import get_db, user_register, verify_password, create_package_data, update_package_data, get_pakid, get_user_pakid, get_package_data, delete_package_data, is_v1_greater_than_v2, create_temp_folder, del_file, get_token, verify_token, update_token
 from qtshiny import RegistrationForm, RShinyApp
 from token_id_gen import generate_short_id
 from xml_gen import generate_xml
@@ -35,7 +35,8 @@ Session(app)
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static/package')
 TEMP_FOLDER = os.path.join(os.path.dirname(__file__), 'temp')
 ALLOWED_EXTENSIONS = set(['zip'])
-HOST = 'http://www.findn.cn:5000'
+HOST = 'http://localhost:5000'
+LIMIT_PACKAGES_NUMBER = 10
 
 
 # 存储所有app信息的字典
@@ -50,7 +51,7 @@ tus_manager(app, upload_url='/file-upload', upload_folder='temp')
 
 
 # 初始化所有app，以及已登录用户的所有app信息
-def init_apps():
+def init_apps(installed_apps):
     try:
         # 获取数据库链接，游标
         db, cur = get_db()
@@ -64,7 +65,17 @@ def init_apps():
         # 从app表查询获取所有app的信息
         all_package = cur.execute("SELECT * FROM package").fetchall()
         for one_package in all_package:
-            package_dict[i] = RShinyApp(one_package[0], one_package[1], one_package[2], one_package[3], one_package[4], one_package[5], one_package[6], one_package[7], one_package[8], one_package[9], one_package[10], one_package[11], one_package[12], one_package[13], one_package[14], one_package[15])
+            pakid = one_package[0]
+            if pakid in installed_apps.keys():
+                version = one_package[3]
+                installed_version = installed_apps.get(pakid)
+                if is_v1_greater_than_v2(version, installed_version):
+                    pakstatus = 'upgradeable'
+                else:
+                    pakstatus = 'installed'
+            else:
+                pakstatus = 'notinstall'
+            package_dict[i] = RShinyApp(one_package[0], one_package[1], one_package[2], one_package[3], one_package[4], one_package[5], one_package[6], one_package[7], one_package[8], one_package[9], one_package[10], one_package[11], one_package[12], one_package[13], one_package[14], one_package[15], pakstatus)
             i += 1
 
         # 编号
@@ -72,7 +83,17 @@ def init_apps():
         # 从app表查询获取已登录用户所有app的信息
         all_my_package = cur.execute("SELECT * FROM package where pakauthor = ?", [session.get('username')]).fetchall()
         for one_package in all_my_package:
-            my_package_dict[i] = RShinyApp(one_package[0], one_package[1], one_package[2], one_package[3], one_package[4], one_package[5], one_package[6], one_package[7], one_package[8], one_package[9], one_package[10], one_package[11], one_package[12], one_package[13], one_package[14], one_package[15])
+            pakid = one_package[0]
+            if pakid in installed_apps.keys():
+                version = one_package[3]
+                installed_version = installed_apps.get(pakid)
+                if is_v1_greater_than_v2(version, installed_version):
+                    pakstatus = 'upgradeable'
+                else:
+                    pakstatus = 'installed'
+            else:
+                pakstatus = 'notinstall'
+            my_package_dict[i] = RShinyApp(one_package[0], one_package[1], one_package[2], one_package[3], one_package[4], one_package[5], one_package[6], one_package[7], one_package[8], one_package[9], one_package[10], one_package[11], one_package[12], one_package[13], one_package[14], one_package[15], pakstatus)
             i += 1
 
         # 提交事务，关闭数据库连接，游标，并回收垃圾
@@ -106,16 +127,41 @@ def doc():
 # RShinyApps页面相关
 @app.route('/apps')
 def apps():
+    # 获取installed_apps
+    ua_str = 'LocalShiny/qy59BctD-1.0.0,ZfEKirv7-0.99,'
+    ua_str = str(request.user_agent)
+    installed_apps = {}
+    if 'LocalShiny' in ua_str:
+        ls = ua_str.split(' ')[-1]
+        apps = ls.split('/')[-1].split(',')
+        apps = list(filter(None, set(apps)))  # 去重去空
+        for app in apps:
+            pid, version = app.split('-')
+            installed_apps[pid] = version
+
     # 先初始化所有app的信息，参数传给apps.html，再渲染页面
-    init_apps()
+    init_apps(installed_apps)
     return render_template('apps.html', package_dict=package_dict, host = HOST)
 
 
 # 用户app页面相关
 @app.route('/myapps')
 def myapps():
+    # 获取installed_apps
+    ua_str = 'LocalShiny/qy59BctD-1.0.0,ZfEKirv7-1.2,'
+    ua_str = str(request.user_agent)
+    installed_apps = {}
+    if 'LocalShiny' in ua_str:
+        ls = ua_str.split(' ')[-1]
+        apps = ls.split('/')[-1].split(',')
+        apps = list(filter(None, set(apps)))  # 去重去空
+        for app in apps:
+            pid, version = app.split('-')
+            installed_apps[pid] = version
+
     # 先初始化已登录用户所有app的信息，参数传给myapps.html，再渲染页面
-    init_apps()
+    init_apps(installed_apps)
+    # print(my_package_dict)
     user_token = None
     logged_in = session.get('logged_in')
     if logged_in:
@@ -317,36 +363,42 @@ def upload():
             rversion = 'None'
             runcmd = 'None'
 
-            # 获取文件名
-            temp_name = str(request.form.get('filename'))
-            # 获取app临时存储路径
-            temp_path = os.path.join(TEMP_FOLDER, temp_name)
-            # 最终app存储名字
-            file_save_name = secure_filename(pakname + '-v' +version + '-' + pakos + '-' + arch +"." + temp_name.rsplit('.')[-1])
-            # 最终app的存储路径，即 static/package/pakauthor/file_save_name
-            filepath = os.path.join(os.path.join(UPLOAD_FOLDER, pakauthor), file_save_name)
-            # 获取fileurl
-            fileurl = "/api/package/xml/" + pakid
-            # app的存储路径不存在且临时存储目录存在，表示app的文件已上传到临时目录，但没有转移到用户目录下
-            if not os.path.exists(filepath) and os.path.exists(temp_path):
-                # 把app的文件从临时目录中剪切到用户目录下
-                shutil.move(temp_path, filepath)
-                # 清空临时存储目录
-                del_file(TEMP_FOLDER)
-                # 把app数据写入数据库
-                create_package_data(pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, rversion, runcmd, filepath, fileurl)
-                # 上传成功后，返回到用户app的页面
-                return redirect('/myapps')
-            # app的存储路径已存在，或者临时目录中不存在已上传的文件（基本不存在），表示app已存在
+            count_package = len(get_user_pakid(pakauthor))
+            if get_pakid(pakname, pakauthor):
+                error = 'App name exists, please change it and try again.'
+            elif count_package > LIMIT_PACKAGES_NUMBER:
+                error = 'You have more than {0} packages.'.format(LIMIT_PACKAGES_NUMBER)
             else:
-                error = "app exists, please upload again"
+                # 获取文件名
+                temp_name = str(request.form.get('filename'))
+                # 获取app临时存储路径
+                temp_path = os.path.join(TEMP_FOLDER, temp_name)
+                # 最终app存储名字
+                file_save_name = secure_filename(pakname + '-v' +version + '-' + pakos + '-' + arch +"." + temp_name.rsplit('.')[-1])
+                # 最终app的存储路径，即 static/package/pakauthor/file_save_name
+                filepath = os.path.join(os.path.join(UPLOAD_FOLDER, pakauthor), file_save_name)
+                # 获取fileurl
+                fileurl = "/api/package/xml/" + pakid
+                # app的存储路径不存在且临时存储目录存在，表示app的文件已上传到临时目录，但没有转移到用户目录下
+                if not os.path.exists(filepath) and os.path.exists(temp_path):
+                    # 把app的文件从临时目录中剪切到用户目录下
+                    shutil.move(temp_path, filepath)
+                    # 清空临时存储目录
+                    del_file(TEMP_FOLDER)
+                    # 把app数据写入数据库
+                    create_package_data(pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, rversion, runcmd, filepath, fileurl)
+                    # 上传成功后，返回到用户app的页面
+                    return redirect('/myapps')
+                # app的存储路径已存在，或者临时目录中不存在已上传的文件（基本不存在），表示app已存在
+                else:
+                    error = "App exists, please upload again."
 
         # 生成当前app的id
         pakid = generate_short_id()
         # 创建app临时存储目录
         create_temp_folder(TEMP_FOLDER)
         # GET请求、app已存在，全部返回到上传页面
-        return render_template('upload.html', error=error , pakid = pakid)
+        return render_template('upload.html', error=error, pakid = pakid)
     except Exception as e:
         return str(e)
 
@@ -356,9 +408,23 @@ def api_upload():
     try:
         if session.get('logged_in'):
             pakinfo = eval(request.form.to_dict()['info'])
-            pakid = generate_short_id()
             pakname = pakinfo['pakname']
             pakauthor = session.get('username')
+            # exist package
+            if get_pakid(pakname, pakauthor):
+                pakid = get_pakid(pakname, pakauthor)
+                package_data = get_package_data(pakid)
+                package_old_path = package_data[13]
+                tag = 1
+            # not exist package
+            else:
+                pakid = generate_short_id()
+                tag = 0
+            count_package = len(get_user_pakid(pakauthor))
+            if count_package > LIMIT_PACKAGES_NUMBER:
+	            resp = jsonify({'result': 0, 'description' : 'You have more than {0} packages.'.format(LIMIT_PACKAGES_NUMBER)})
+	            resp.status_code = 400
+	            return resp
             version = pakinfo['version']
             pakdesc = pakinfo['pakdesc']
             # 变量名不能设置为os，否则会冲突
@@ -384,16 +450,26 @@ def api_upload():
                 file_save_name = secure_filename(pakname + '-v' +version + '-' + pakos + '-' + arch +"." + temp_name.rsplit('.')[-1])
                 filepath = os.path.join(os.path.join(UPLOAD_FOLDER, pakauthor), file_save_name)
                 fileurl = "/api/package/xml/" + pakid
-                # app的存储路径不存在
-                if not os.path.exists(filepath):
+
+                # upload package
+                if tag==0:
                     create_package_data(pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, rversion, runcmd, filepath, fileurl)
                     file.save(filepath)
                     resp = jsonify({'result': 1, 'description' : 'File successfully uploaded.', 'pakid': pakid})
                     resp.status_code = 201
-                else:
-                    resp = jsonify({'result': 0, 'description' : 'Package exists, please upload again.'})
-                    resp.status_code = 400
-                return resp
+                    return resp
+
+                # update package
+                elif tag==1:
+                    # 在用户目录下删除package原文件
+                    os.remove(package_old_path)
+                    # 存储更新的文件
+                    file.save(filepath)
+                    # 更新package_data
+                    update_package_data(pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, rversion, runcmd, filepath, fileurl)
+                    resp = jsonify({'result': 1, 'description' : pakname + ' successfully updated.', 'pakid': pakid})
+                    resp.status_code = 201
+                    return resp
             else:
                 resp = jsonify({'result': 0, 'description' : 'Allowed file types can only be zip.'})
                 resp.status_code = 400
@@ -672,6 +748,34 @@ def api_delete(pakid):
         resp = jsonify({'result': 0, 'description' : 'Package was not found.'})
         resp.status_code = 404
         return resp
+
+
+@app.route('/api/delete/<pakname>', methods=['POST'])
+def api_delete_by_pakname(pakname):
+    try:
+        if session.get('logged_in'):
+            # 获取package_data
+            logged_in_username = session.get('username')
+            pakid = get_pakid(pakname, logged_in_username)
+            if pakid:
+                delete_package_data(pakid)
+                resp = jsonify({'result': 1, 'description' : pakname + ' successfully deleted.', 'pakid': pakid})
+                resp.status_code = 201
+            else:
+                resp = jsonify({'result': 0, 'description' : 'Package was not found.'})
+                resp.status_code = 404
+            return resp
+        # 用户未登录
+        else:
+            resp = jsonify({'result': 0, 'description' : 'Authentication failed.'})
+            resp.status_code = 401
+            return resp
+    except Exception as error:
+        # abort(404)
+        resp = jsonify({'result': 0, 'description' : error})
+        resp.status_code = 404
+        return resp
+
 
 
 # --host=0.0.0.0 --port=5000    表明局域网内可以访问服务器，端口号为5000

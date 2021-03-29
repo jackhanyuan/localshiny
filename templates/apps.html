@@ -48,10 +48,16 @@
                     <div class="list-meta" style="border-bottom: 1px solid #ddd">
                         <span>{{ package_dict[pak_id].pakos }}_{{ package_dict[pak_id].arch }} URL:</span>
                         <span id="URL_{{ pak_id }}">{{ package_dict[pak_id].fileurl }}</span>
-                        <button onclick="copyURL({{ pak_id }})">copy link</button>
+                        {% if package_dict[pak_id].pakstatus == 'notinstall' %}
+                            <button name='copylink' id={{host}}{{ package_dict[pak_id].fileurl }} onclick="copyURL({{ pak_id }})">Install</button>
+                        {% elif package_dict[pak_id].pakstatus == 'upgradeable' %}
+                            <button name='copylink' id={{host}}{{ package_dict[pak_id].fileurl }} onclick="copyURL({{ pak_id }})">Update</button>
+                        {% elif package_dict[pak_id].pakstatus == 'installed' %}
+                            <button name='copylink' id={{host}}{{ package_dict[pak_id].fileurl }}>Installed</button>
+                        {% endif %}
                     </div>
                     <div class="summary">
-                        <p>{{ package_dict[pak_id].pakdesc }}</p>
+                        <p>{{ package_dict[pak_id].pakdesc[0:220] }}</p>
                     </div>
                     <span class="book-number">{{ pak_id }}</span>
                 </section>

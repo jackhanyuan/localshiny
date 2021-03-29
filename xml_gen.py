@@ -102,3 +102,6 @@ def generate_xml(pakid, pakname, pakauthor, version, pakdesc, pakos, pakdate, up
 
 	# write out xml data
 	tree.write(UPLOAD_FOLDER + '/result.xml', encoding='utf-8', xml_declaration=True)
+
+
+generate_xml('1','1','1','1','1','1','1','1','1','1','1')

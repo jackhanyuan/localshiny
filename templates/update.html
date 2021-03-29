@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Update app</title>
     <link rel="stylesheet" href="../static/css/style.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css"
-          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
     <link rel="icon" type="image/x-icon" href="/static/img/favicon.ico">
     {#    <link href="../static/css/demo.css" rel="stylesheet" media="screen"/>#}
 </head>
@@ -24,7 +23,7 @@
                         <div class="input-group">
                             <input type="text" name="pakname" class="form-control"
                                    aria-describedby="validatedInputGroupPrepend"
-                                   id="input1" placeholder="app name" value="{{ pakname }}" style="margin-left: 0">
+                                   id="input1" placeholder="app name" value="{{ pakname }}" readonly style="margin-left: 0">
                             <input type="text" name="pakid" class="form-control"
                                    aria-describedby="validatedInputGroupPrepend"
                                    id="input2" placeholder="app id" value="{{ pakid }}" readonly style="margin-left: 0">
@@ -39,7 +38,7 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="input4">OS:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;&nbsp;Arch:</label>
+                        <label for="input4">OS:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;Arch:</label>
                         <div class="input-group">
                             <select name="pakos" id="input4" class="form-control" required style="margin-left: 0">
                                 <option value="{{ pakos }}" selected hidden >{{ pakos }}</option>

@@ -100,7 +100,7 @@ function startUpload() {
             input.setAttribute("disabled", true);
             inputLabel.textContent = file.name;
             filenameInput.value = filename;
-            notice.textContent = notice.textContent + ". You have uploaded the file and are not allowed to continue uploading."
+            notice.textContent = notice.textContent + "File successfully uploaded."
             reset();
         }
     };

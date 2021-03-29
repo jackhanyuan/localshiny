@@ -1,18 +1,18 @@
 <?xml version='1.0' encoding='utf-8'?>
 <app>
   <head>
-    <title>idem</title>
-    <date>2021-03-28 21:22:03</date>
+    <title>1</title>
+    <date>2021-03-29 01:31:15</date>
     <icon />
-    <pakid>VfgDimm3</pakid>
-    <pakname>idem</pakname>
-    <pakauthor>nattt</pakauthor>
-    <description>This is an application named 'idem' !</description>
-    <pakdate>2021-03-22</pakdate>
+    <pakid>1</pakid>
+    <pakname>1</pakname>
+    <pakauthor>1</pakauthor>
+    <description>1</description>
+    <pakdate>1</pakdate>
   </head>
   <install preferred="localShiny">
-    <localShiny RVersion="4.0.4" localShinyVersion="1.0" pakVersion="1.0">
-      <Rcommand>Rscript -e "args=commandArgs(TRUE);library(localShiny);installApp(args[1])" VfgDimm3</Rcommand>
+    <localShiny pakVersion="1" RVersion="1" localShinyVersion="1.0">
+      <Rcommand>Rscript -e "args=commandArgs(TRUE);library(localShiny);installApp(args[1])" 1</Rcommand>
     </localShiny>
     <rportable>
       <Windows OSVersion="Windows10" RVersion="4.0.4">
@@ -27,6 +27,6 @@
     </rportable>
   </install>
   <run>
-    <Rcommand>runApp.R</Rcommand>
+    <Rcommand>1</Rcommand>
   </run>
 </app>

@@ -2,6 +2,7 @@
 import gc
 import os
 from passlib.hash import sha256_crypt
+import re
 import shutil
 import sqlite3
 import time
@@ -132,6 +133,8 @@ def delete_user(username):
     close_db(db, cur)
     return True
 
+
+
 # ----------------------------------token相关-------------------------------
 # 获取token
 def get_token(username):
@@ -227,17 +230,44 @@ def update_package_data(pakid, pakname, pakauthor, version,  pakdesc, pakos, arc
     return True
 
 
+def get_pakid(pakname, pakauthor):
+    # 获取数据库链接，游标
+    db, cur = get_db()
+
+    # 获取要删除的pakid
+    try:
+        pakid = cur.execute("SELECT pakid FROM package where pakname = ? and pakauthor = ?", [pakname, pakauthor]).fetchone()[0]
+        return pakid
+    except:
+        return False
+
+    # 提交事务，关闭数据库连接，游标，回收垃圾
+    close_db(db, cur)
+
+
 def get_package_data(pakid):
     # 获取数据库链接，游标
     db, cur = get_db()
     # 查询package_data
     package_data = cur.execute("SELECT * FROM package where pakid = ?",
-                               [pakid]).fetchone()
+                                      [pakid]).fetchone()
 
     # 提交事务，关闭数据库连接，游标，回收垃圾
     close_db(db, cur)
 
     return package_data
+
+
+def get_user_pakid(pakauthor):
+    # 获取数据库链接，游标
+    db, cur = get_db()
+    pakid = cur.execute("SELECT pakid,pakname FROM package where pakauthor = ?", [pakauthor]).fetchall()
+    pakid = list(pakid)
+
+    # 提交事务，关闭数据库连接，游标，回收垃圾
+    close_db(db, cur)
+
+    return pakid
 
 
 def delete_package_data(pakid):
@@ -246,7 +276,7 @@ def delete_package_data(pakid):
 
     # 要删除package的存储路径
     filepath = cur.execute("SELECT filepath FROM package where pakid = ?",
-                           [pakid]).fetchone()[0]
+                                  [pakid]).fetchone()[0]
 
     # 路径存在，则删除该package的文件
     if os.path.exists(filepath):
@@ -260,6 +290,31 @@ def delete_package_data(pakid):
 
     return True
 
+
+def is_v1_greater_than_v2(v1, v2):
+
+    v1_check = re.match("\d+(\.\d+){0,2}", v1)
+    v2_check = re.match("\d+(\.\d+){0,2}", v2)
+    if v1_check is None or v2_check is None or v1_check.group() != v1 or v2_check.group() != v2:
+        return "Wrong version format, the correct one should be x.x.x"
+    v1_list = v1.split(".")
+    v2_list = v2.split(".")
+    v1_len = len(v1_list)
+    v2_len = len(v2_list)
+    if v1_len > v2_len:
+        for i in range(v1_len - v2_len):
+            v2_list.append("0")
+    elif v2_len > v1_len:
+        for i in range(v2_len - v1_len):
+            v1_list.append("0")
+    else:
+        pass
+    for i in range(len(v1_list)):
+        if int(v1_list[i]) > int(v2_list[i]):
+            return True
+        if int(v1_list[i]) < int(v2_list[i]):
+            return False
+    return False
 
 # ----------------------------------------文件夹相关---------------------------
 
@@ -288,14 +343,16 @@ def del_file(filepath):
 
 
 # if __name__ == '__main__':
-#     delete_user('python')
+#     delete_user('admin')
 #     get_data()
-# print('-' * 50)
-# user_register('haha1','test','test')
-# print('-' * 50)
-# get_data()
-# print(get_token('haha'))
-# print(update_token('admin'))
-# print(get_token('haha'))
-# print(verify_token(get_token('haha')))
+#     print(get_pakid('idem3', 'admin3'))
+#     print(get_user_pakid('hello'))
+    # print('-' * 50)
+    # user_register('haha1','test','test')
+    # print('-' * 50)
+    # get_data()
+    # print(get_token('haha'))
+    # print(update_token('admin'))
+    # print(get_token('haha'))
+    # print(verify_token(get_token('haha')))
 
