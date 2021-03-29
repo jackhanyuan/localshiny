@@ -1,12 +1,31 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
+    <!-- Required meta tags -->
     <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
     <title>All apps</title>
     <link rel="stylesheet" href="../static/css/style.css" />
     <link rel="stylesheet" href="../static/css/fonts.css" />
     <link rel="icon" type="image/x-icon" href="/static/img/favicon.ico">
     <style>
+        .myButton2 {
+            font-family: Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+            font-size: 14px;
+            background-color: #254577;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            width: 70px;
+            height: 30px;
+            text-transform: capitalize;
+            box-shadow: none;
+            outline: 0 none;
+            transition: all 0.5s ease 0s;
+        }
+
         #URLText {
             position: absolute;
             top: 0;
@@ -38,7 +57,7 @@
 
         <div class="item-list" id="itemlist">
             {% for pak_id in package_dict %}
-                <section class="article-list" style="background: linear-gradient(to top, #75aadb, white 6.7%);">
+                <section class="article-list">
                     <h1>{{ package_dict[pak_id].pakname }}</h1>
                     <h2 class="list-meta" style="font-size: 1em;">
                         <span>By {{ package_dict[pak_id].pakauthor }}</span>
@@ -49,17 +68,17 @@
                         <span>{{ package_dict[pak_id].pakos }}_{{ package_dict[pak_id].arch }} URL:</span>
                         <span id="URL_{{ pak_id }}">{{ package_dict[pak_id].fileurl }}</span>
                         {% if package_dict[pak_id].pakstatus == 'notinstall' %}
-                            <button name='copylink' id={{host}}{{ package_dict[pak_id].fileurl }} onclick="copyURL({{ pak_id }})">Install</button>
+                            <button class='myButton2' name='copylink' id={{host}}{{ package_dict[pak_id].fileurl }} onclick="copyURL({{ pak_id }})">Install</button>
                         {% elif package_dict[pak_id].pakstatus == 'upgradeable' %}
-                            <button name='copylink' id={{host}}{{ package_dict[pak_id].fileurl }} onclick="copyURL({{ pak_id }})">Update</button>
+                            <button name='copylink' class='myButton2' id={{host}}{{ package_dict[pak_id].fileurl }} onclick="copyURL({{ pak_id }})">Update</button>
                         {% elif package_dict[pak_id].pakstatus == 'installed' %}
-                            <button name='copylink' id={{host}}{{ package_dict[pak_id].fileurl }}>Installed</button>
+                            <button name='copylink' class='myButton2' id={{host}}{{ package_dict[pak_id].fileurl }}>Installed</button>
                         {% endif %}
                     </div>
                     <div class="summary">
                         <p>{{ package_dict[pak_id].pakdesc[0:220] }}</p>
                     </div>
-                    <span class="book-number">{{ pak_id }}</span>
+{#                    <span class="book-number">{{ pak_id }}</span>#}
                 </section>
             {% endfor %}
         </div>

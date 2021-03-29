@@ -1,15 +1,95 @@
 <!doctype html>
-<html>
+<html lang="en-us">
 <head>
-    <meta charset="UTF-8">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>New app</title>
     <link rel="stylesheet" href="../static/css/style.css"/>
+    <link rel="stylesheet" href="../static/css/fonts.css"/>
     <link rel="stylesheet" href="../static/css/bootstrap.min.css">
     <link rel="icon" type="image/x-icon" href="/static/img/favicon.ico">
-    {#    <link href="../static/css/demo.css" rel="stylesheet" media="screen"/>#}
+    <style>
+        body {
+            font-family: Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #212529;
+            text-align: left;
+            background-color: #fff;
+        }
+        .container {
+            padding-top: 40px;
+            padding-bottom: 40px;
+            width: 1000px;
+        }
+        .card-body {
+            -ms-flex: 1 1 auto;
+            flex: 1 1 auto;
+            min-height: 1px;
+            padding: 1.5rem;
+        }
+        .form-control {
+            display: block;
+            width: 100%;
+            height: calc(1.5em + .75rem + 2px);
+            padding: .375rem .75rem;
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #254577;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: none;
+            border-radius: 5px;
+            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+        }
+        .progress {
+            height: 32px;
+            border-radius: 5px;
+            display: -ms-flexbox;
+            display: flex;
+            overflow: hidden;
+            line-height: 0;
+            font-size: .75rem;
+            background-color: #e9ecef;
+            border-radius: .25rem;
+        }
+        .progress-bar {
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            -ms-flex-pack: center;
+            justify-content: center;
+            overflow: hidden;
+            color: #fff;
+            text-align: center;
+            white-space: nowrap;
+            background-color: #254577;
+            transition: width .6s ease;
+        }
+        .myButton {
+            font-family: Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+            font-size: 16px;
+            background-color: #254577;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            width: 100px;
+            height: 35px;
+            text-transform: capitalize;
+            box-shadow: none;
+            outline: 0 none;
+            transition: all 0.5s ease 0s;
+        }
+    </style>
 </head>
-<body>
+<body style='font-family: Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;'>
 {% extends 'base.html' %}
 {% block content %}
 {#为了给临时上传文件提供文件名#}
@@ -24,7 +104,8 @@
                             <label for="input0">Warning: {{ error }} </label>
                             <br>
                         {% endif %}
-                        <label for="input1">App name:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;App id:</label>
+                        <label for="input1">App name:</label>
+                        <label style="text-indent: 375px;" left;>Appid:</label>
                         <div class="input-group">
                             <input type="text" name="pakname" class="form-control"
                                    aria-describedby="validatedInputGroupPrepend"
@@ -48,7 +129,8 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="input4">OS:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;Arch:</label>
+                        <label for="input4">OS:</label>
+                        <label style="text-indent: 430px;">Arch:</label>
                         <div class="input-group">
                             <select name="pakos" id="input4" class="form-control" required style="margin-left: 0">
                                 <option value="" disabled selected hidden>-- Please select OS --</option>
@@ -93,21 +175,14 @@
                     </div>
                     <input type="hidden" name="filename" id="filename">
                     <br>
-                    <button class="btn btn-primary" id="subButton" type="submit" disabled>Submit</button>
+                    <button class="myButton" id="subButton" type="submit" disabled>Submit</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
-        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
-        crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-        crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"
-        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
-        crossorigin="anonymous"></script>
+<script src="../static/js/jquery-3.6.0.min.js"></script>
+<script src="../static/js/bootstrap.min.js"></script>
 <script src="../static/js/tus.min.js"></script>
 <script src="../static/js/upload.js"></script>
 {% endblock content %}

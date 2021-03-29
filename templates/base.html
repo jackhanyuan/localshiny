@@ -1,60 +1,54 @@
 {% block top %}
-<!--nav标签为导航标签，定义导航链接部分，IE 8及之前版本不支持nav标签-->
-<nav class="menu">
-    <!--导航栏列表-->
-    <ul>
-        <!--logo图标，转到Home页-->
-        <li class="icon left">
-            <a href="/"><img src="/static/img/LocalShiny256X256.png" alt="RShiny" title="RShiny"/></a>
-        </li>
-        <!--Home页   显示Qt程序，以及下载Qt程序-->
-        <li>
-            <a href="/">Home</a>
-        </li>
-        <!--About页  关于Qt程序，关于...-->
-        <li>
-            <a href="/about">About</a>
-        </li>
-        <!--Documentation页  Qt程序的使用文档-->
-        <li>
-            <a href="/doc">Documentation</a>
-        </li>
-        <!--RShinyApps页 显示Package列表，用户登录后还可以显示MyApps，以及上传Package-->
-        <li>
-            <a href="/apps">All apps</a>
-        </li>
-        <!--Log in 页面   用户注册登录，数据库用sqlite，http://bookdown.org/connect/-->
-        <li>
-            <a href="/login">
-                {% if session.get('logged_in') == None %}
-                    Log in
-                {% else %}
-                    {{ session.get('username') + "'s apps" }}
-                {% endif %}
-            </a>
-        </li>
-        <!--用户注销，退出登录-->
-        <li>
-            <a href="/logout">
-                {% if session.get('logged_in') != None %}
-                    Log out
-                {% endif %}
-            </a>
-        </li>
-    </ul>
-</nav>
+    <!--nav标签为导航标签，定义导航链接部分，IE 8及之前版本不支持nav标签-->
+    <nav class="menu">
+        <!--导航栏列表-->
+        <ul>
+            <!--logo图标，转到Home页-->
+            <li class="icon left">
+                <a href="/"><img src="/static/img/LocalShiny256X256.png" alt="RShiny" title="RShiny"/></a>
+            </li>
+            <li>
+                <a href="/">Home</a>
+            </li>
+            <li>
+                <a href="/about">About</a>
+            </li>
+            <li>
+                <a href="/doc">Documentation</a>
+            </li>
+            <li>
+                <a href="/apps">All apps</a>
+            </li>
+            <li>
+                <a href="/login">
+                    {% if session.get('logged_in') == None %}
+                        Log in
+                    {% else %}
+                        {{ session.get('username') + "'s apps" }}
+                    {% endif %}
+                </a>
+            </li>
+            <!--用户注销，退出登录-->
+            <li>
+                <a href="/logout">
+                    {% if session.get('logged_in') != None %}
+                        Log out
+                    {% endif %}
+                </a>
+            </li>
+        </ul>
+    </nav>
 {% endblock top %}
 
 {% block content %}
 {% endblock content %}
 
 {% block bottom %}
-<!--footer标签，页脚标签，写一些创作者相关信息，姓名、文档创作日期以及联系方式-->
-<footer>
-    <div class="footer">
-        <div class="copyright">
-            © <a href="https://www.rstudio.com">RStudio, PBC</a> 2016 &ndash; 2020
+    <footer>
+        <div class="footer">
+            <div class="copyright">
+                © <a href="https://www.findn.cn:5000">LocalShiny 2021</a>
+            </div>
         </div>
-    </div>
-</footer>
+    </footer>
 {% endblock bottom %}

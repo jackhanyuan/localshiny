@@ -1,118 +1,105 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en-us">
 <head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <link rel="stylesheet" href="../static/css/style.css" />
-    <link rel="stylesheet" href="../static/css/fonts.css" />
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="../static/css/style.css"/>
+    <link rel="stylesheet" href="../static/css/fonts.css"/>
     <link rel="icon" type="image/x-icon" href="/static/img/favicon.ico">
+
+    <title>Login</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
+        .form-horizontal{
+            padding-top: 40px;
+            padding-bottom: 40px;
+            border-radius: 15px;
+            text-align: center;
         }
 
-        html {
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-            margin: 0;
-            padding: 0;
-            background-repeat: no-repeat;
-            background-size: 100% 100%;
-            -moz-background-size: 100% 100%;
+        .form-horizontal .form-group{
+            padding: 0 40px;
+            margin: 0 0 25px 0;
+            position: relative;
         }
-
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
+        .form-horizontal .form-control{
+            font-family: Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+            font-size: 15px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 20px;
+            box-shadow: none;
+            padding: 0 20px 0 30px;
+            height: 40px;
+            transition: all 0.3s ease 0s;
         }
-
-        #loginDiv {
-            width: 30%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 350px;
-            background-color: lightsteelblue;
-            box-shadow: 7px 7px 17px rgba(52, 56, 66, 0.5);
+        .form-horizontal .form-control:focus{
+            background: #e0e0e0;
+            box-shadow: none;
+            outline: 0 none;
+        }
+        .form-horizontal .text{
+            font-family: Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+            float: left;
+            margin-left: 7px;
+            line-height: 20px;
+            padding-top: 5px;
+            text-transform: capitalize;
+        }
+        .form-horizontal .btn{
+            font-family: Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+            font-size: 14px;
+            color: #fff;
+            background: #254577;
             border-radius: 5px;
+            padding: 10px 32px;
+            width: 105px;
+            border: none;
+            text-transform: capitalize;
+            box-shadow: none;
+            outline: 0 none;
+            transition: all 0.5s ease 0s;
         }
-
-        p {
-            margin-top: 40px;
-            margin-left: 20px;
-            color: azure
-        }
-
-        input {
-            margin-left: 15px;
-            border-radius: 5px;
-            border-style: hidden;
-            height: 30px;
-            width: 180px;
-            background-color: whitesmoke;
-            outline: none;
-            padding-left: 10px;
-            font-size: large;
-        }
-
-        .button {
-            border-color: cornsilk;
-            background-color: rgba(100, 149, 237, .7);
-            color: aliceblue;
-            border-style: hidden;
-            border-radius: 5px;
-            width: 100px;
-            height: 32px;
-            font-size: 20px;
+        @media only screen and (max-width: 479px){
+            .form-horizontal .form-group{
+                padding: 0 25px;
+            }
+            .form-horizontal .form-group i{
+                left: 45px;
+            }
+            .form-horizontal .btn{
+                padding: 10px 50px;
+            }
         }
     </style>
 </head>
-
 <body>
+{% extends 'base.html' %}
+{% block content %}
+<div>
+    <form class="form-horizontal" id="form" action="/login" method="post">
+        <div class="form-group">
+            <img src="../static/img/LocalShiny256X256.png" height="50px" width="50px" >
+        </div>
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Username" name="username" value="{{ request.form.username }}" />
+        </div>
+        <div class="form-group">
+            <input type="password" class="form-control" placeholder="Password" name="password" value="{{ request.form.password }}" />
+        </div>
+        <div class="form-group">
+        <button class="btn" type="submit" value="login" />login</button>
+        <button class="btn" type="button" onclick="location.href='/register'" value="register">register</button>
+        </div>
+        <div>
+            {% if error %}<strong>Error: </strong>{{ error }}.{% endif %}
+        </div>
+    </form>
+</div>
+{% endblock content %}
 
-{#{% extends 'base.html' %}#}
-{#{% block content %}#}
-    <div id="loginDiv">
-        <form action="/login" id="form" method="post">
-            <h1 style="text-align: center;color: aliceblue;">Log in</h1>
-            <div style="text-align: center;margin-top: 30px;">
-                <p>
-                    <span style="font-size: large">username :</span>
-                    <span>
-                        <label>
-                            <input type="text" placeholder="username" name="username" value="{{ request.form.username }}" />
-                        </label>
-                    </span>
-                </p>
-            </div>
-            <div style="text-align: center;margin-top: 30px;">
-                <p>
-                    <span style="font-size: large">password :</span>
-                    <span>
-                        <label>
-                            <input type="password" placeholder="password" name="password" value="{{ request.form.password }}" />
-                        </label>
-                    </span>
-                </p>
-            </div>
-            <div style="text-align: center;margin-top: 30px;">
-                <span><input type="submit" class="button" value="login" /></span>
-                <span><input type="button" class="button" onclick="location.href='/register'" value="register"></span>
-            </div>
-            <div style="text-align: center;margin-top: 30px;">
-                <span>
-                    {% if error %}
-                        <p>{{ error }}</p>
-                    {% endif %}
-                </span>
-            </div>
-        </form>
-    </div>
-{#{% endblock content %}#}
 </body>
 </html>
 
