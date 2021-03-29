@@ -3,31 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Update apps</title>
+    <title>Update app</title>
+    <link rel="stylesheet" href="../static/css/style.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css"
           integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    <link href="../static/css/demo.css" rel="stylesheet" media="screen"/>
+{#    <link href="../static/css/demo.css" rel="stylesheet" media="screen"/>#}
 </head>
 <body>
+{% extends 'base.html' %}
+{% block content %}
 <input type="hidden" id="username" value="{{ session.get('username') }}">
 <div class="container">
     <div class="row">
         <div class="col card" style="background-color: gainsboro">
             <div class="card-body">
-                <form action="/update/{{ app_name }}" name="form" id="form" method="post">
+                <form action="/update/{{ pakid }}" name="form" id="form" method="post">
                     <div class="mb-3">
-                        <label for="input1">app name:</label>
+                        <label for="input1">App name:</label>
                         <div class="input-group">
-                            <input type="text" name="app_name" class="form-control"
+                            <input type="text" name="pakname" class="form-control"
                                    aria-describedby="validatedInputGroupPrepend"
-                                   id="input1" placeholder="app name" value="{{ app_name }}" readonly style="margin-left: 0">
+                                   id="input1" placeholder="app name" value="{{ pakname }}" readonly style="margin-left: 0">
+                        </div>
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label for="input2">App id:</label>
+                        <div class="input-group">
+                            <input type="text" name="pakid" class="form-control"
+                                   aria-describedby="validatedInputGroupPrepend"
+                                   id="input2" placeholder="app id" value="{{ pakid }}" readonly style="margin-left: 0">
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="validationTextarea">app summary:</label>
-                        <textarea class="form-control" rows="5" name="app_summary" id="validationTextarea2"
-                                  placeholder="app summary"
-                                  required style="margin-left: 0">{{ app_summary }}</textarea>
+                        <label for="input3">Version:</label>
+                        <div class="input-group">
+                            <input type="text" name="version" class="form-control"
+                                   aria-describedby="validatedInputGroupPrepend"
+                                   id="input3" placeholder="your package version" value="{{ version }}" required style="margin-left: 0">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="input4">OS:</label>
+                        <div class="input-group">
+                            <input type="text" name="pakos" class="form-control"
+                                   aria-describedby="validatedInputGroupPrepend"
+                                   id="input4" placeholder="Windows or Linux or macOS or All" value="{{ pakos }}" required style="margin-left: 0">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="input5">Arch:</label>
+                        <div class="input-group">
+                            <input type="text" name="arch" class="form-control"
+                                   aria-describedby="validatedInputGroupPrepend"
+                                   id="input5" placeholder="x86 or x64 or arm64" value="{{ arch }}" required style="margin-left: 0">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="validationTextarea">Description:</label>
+                        <textarea class="form-control" rows="5" name="pakdesc" id="validationTextarea2"
+                                  placeholder="a brief description"
+                                  required style="margin-left: 0">{{ pakdesc }}</textarea>
                     </div>
                     <div class="mb-3">
                         <small id="emailHelp" class="form-text text-muted">
@@ -50,7 +87,6 @@
                         </div>
                     </div>
                     <input type="hidden" name="filename" id="filename">
-                    <input type="hidden" name="app_old_path" id="app_old_path" value="{{ app_old_path }}">
                     <br>
                     <button class="btn btn-primary" id="subButton" type="submit">Submit</button>
                 </form>
@@ -69,5 +105,6 @@
         crossorigin="anonymous"></script>
 <script src="../static/js/tus.min.js"></script>
 <script src="../static/js/upload.js"></script>
+{% endblock content %}
 </body>
 </html>

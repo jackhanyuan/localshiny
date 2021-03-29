@@ -1,6 +1,4 @@
 from wtforms import Form, StringField, PasswordField, BooleanField, validators
-import os
-import shutil
 
 
 # 定义注册表单form，使用flask-WTF表单系统
@@ -24,33 +22,17 @@ class RegistrationForm(Form):
 
 # 定义app类，每个对象对应app表中的一个记录
 class RShinyApp:
-    def __init__(self, app_name, app_author, app_date, app_summary, app_url, app_path):
-        self.app_name = app_name
-        self.app_author = app_author
-        self.app_date = app_date
-        self.app_summary = app_summary
-        self.app_url = app_url
-        self.app_path = app_path
+    def __init__(self, pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, filename, fileurl):
+        self.pakid = pakid
+        self.pakname = pakname
+        self.pakauthor = pakauthor
+        self.version = version
+        self.pakdesc = pakdesc
+        self.pakos = pakos
+        self.arch = arch
+        self.distribution = distribution
+        self.pakdate = pakdate
+        self.upmethod = upmethod
+        self.filename = filename
+        self.fileurl = fileurl
 
-
-# 创建app临时存储目录
-def create_temp_folder(temp_path):
-    # 如果不存在临时目录，则创建temp目录作为app的临时目录
-    if not os.path.exists(temp_path):
-        os.makedirs(temp_path, exist_ok=True)
-
-
-# 删除某一目录下的所有文件或文件夹
-def del_file(filepath):
-    """
-    删除某一目录下的所有文件或文件夹
-    :param filepath: 路径
-    :return:
-    """
-    del_list = os.listdir(filepath)
-    for f in del_list:
-        file_path = os.path.join(filepath, f)
-        if os.path.isfile(file_path):
-            os.remove(file_path)
-        elif os.path.isdir(file_path):
-            shutil.rmtree(file_path)
