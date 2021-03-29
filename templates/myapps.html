@@ -5,6 +5,7 @@
     <title>My apps</title>
     <link rel="stylesheet" href="../static/css/style.css"/>
     <link rel="stylesheet" href="../static/css/fonts.css"/>
+    <link rel="icon" type="image/x-icon" href="/static/img/favicon.ico">
     <style>
         .myButton {
             border-color: cornsilk;
@@ -60,51 +61,52 @@
 <input type="text" id="URLText">
 {% extends 'base.html' %}
 {% block content %}
-    <main class="">
+<main class="">
 
-        <p>Below is a list of books written with <strong>bookdown</strong>, including those published to bookdown.org
-            (books without substantial content are excluded) and a few hosted on external servers. The books are ordered
-            roughly by date. An asterisk <code>*</code> after a date indicates the date is unknown, which often means a
-            <code>date</code> field is missing in the YAML metadata of the source document <code>index.Rmd</code>. The
-            list of books is automatically generated. For more information (including how to add or remove your books on
-            this page), please see the <a href="../about">About</a> page.</p>
+    <p>Below is a list of books written with <strong>bookdown</strong>, including those published to bookdown.org
+        (books without substantial content are excluded) and a few hosted on external servers. The books are ordered
+        roughly by date. An asterisk <code>*</code> after a date indicates the date is unknown, which often means a
+        <code>date</code> field is missing in the YAML metadata of the source document <code>index.Rmd</code>. The
+        list of books is automatically generated. For more information (including how to add or remove your books on
+        this page), please see the <a href="../about">About</a> page.</p>
 
-        {% if session.get('logged_in') != None %}
-            <div class="item-list">
-                <!--上传Package按钮，用户登录后显示-->
-                <button type="button" class="addButton" onclick="location.href='/upload'">new app</button>
+    {% if session.get('logged_in') != None %}
+    <div class="item-list">
+        <!--上传Package按钮，用户登录后显示-->
+        <button type="button" class="addButton" onclick="location.href='/upload'">new app</button>
+    </div>
+    <p>Your token : {{ token }}</p>
+    {% endif %}
+
+    <div class="item-list" id="itemlist">
+        {% for pak_id in my_package_dict %}
+        <section class="article-list" style="background: linear-gradient(to top, #75aadb, white 6.7%);">
+            <h1>{{ my_package_dict[pak_id].pakname }}</h1>
+            <input type="hidden" id="delete_url{{ pak_id }}" value="/delete/{{ my_package_dict[pak_id].pakid }}">
+            <button type="button" class="myButton"
+                    id="deleteBtn" onclick="deleteFuc({{ pak_id }});">delete
+            </button>
+            <button type="button" class="myButton"
+                    onclick="location.href='/update/{{ my_package_dict[pak_id].pakid }}'">update
+            </button>
+            <h2 class="list-meta" style="font-size: 1em;">
+                <span>By {{ my_package_dict[pak_id].pakauthor }}</span>
+                <span>Version: {{ my_package_dict[pak_id].version }}</span>
+                <span>{{ my_package_dict[pak_id].pakdate }}</span>
+            </h2>
+            <div class="list-meta" style="border-bottom: 1px solid #ddd">
+                <span>{{ my_package_dict[pak_id].pakos }}_{{ my_package_dict[pak_id].arch }} URL:</span>
+                <span id="URL_{{ pak_id }}">{{ my_package_dict[pak_id].fileurl }}</span>
+                <button onclick="copyURL({{ pak_id }})">copy link</button>
             </div>
-        {% endif %}
-
-        <div class="item-list" id="itemlist">
-            {% for pak_id in my_package_dict %}
-                <section class="article-list" style="background: linear-gradient(to top, #75aadb, white 6.7%);">
-                    <h1>{{ my_package_dict[pak_id].pakname }}</h1>
-                    <input type="hidden" id="delete_url{{ pak_id }}" value="/delete/{{ my_package_dict[pak_id].pakid }}">
-                    <button type="button" class="myButton"
-                            id="deleteBtn" onclick="deleteFuc({{ pak_id }});">delete
-                    </button>
-                    <button type="button" class="myButton"
-                            onclick="location.href='/update/{{ my_package_dict[pak_id].pakid }}'">update
-                    </button>
-                    <h2 class="list-meta" style="font-size: 1em;">
-                        <span>By {{ my_package_dict[pak_id].pakauthor }}</span>
-                        <span>Version: {{ my_package_dict[pak_id].version }}</span>
-                        <span>{{ my_package_dict[pak_id].pakdate }}</span>
-                    </h2>
-                    <div class="list-meta" style="border-bottom: 1px solid #ddd">
-                        <span>{{ my_package_dict[pak_id].pakos }}_{{ my_package_dict[pak_id].arch }} URL:</span>
-                        <span id="URL_{{ pak_id }}">{{ my_package_dict[pak_id].fileurl }}</span>
-                        <button onclick="copyURL({{ pak_id }})">copy link</button>
-                    </div>
-                    <div class="summary">
-                        <p>{{ my_package_dict[pak_id].pakdesc }}</p>
-                    </div>
-                    <span class="book-number">{{ pak_id }}</span>
-                </section>
-            {% endfor %}
-        </div>
-    </main>
+            <div class="summary">
+                <p>{{ my_package_dict[pak_id].pakdesc }}</p>
+            </div>
+            <span class="book-number">{{ pak_id }}</span>
+        </section>
+        {% endfor %}
+    </div>
+</main>
 {% endblock content %}
 
 </body>

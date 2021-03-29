@@ -22,7 +22,7 @@ class RegistrationForm(Form):
 
 # 定义app类，每个对象对应app表中的一个记录
 class RShinyApp:
-    def __init__(self, pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, filename, fileurl):
+    def __init__(self, pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, title, rversion, runcmd, filepath, fileurl, paktag):
         self.pakid = pakid
         self.pakname = pakname
         self.pakauthor = pakauthor
@@ -33,6 +33,10 @@ class RShinyApp:
         self.distribution = distribution
         self.pakdate = pakdate
         self.upmethod = upmethod
-        self.filename = filename
+        self.title = title
+        self.rversion = rversion
+        self.runcmd = runcmd
+        self.filepath = filepath
         self.fileurl = fileurl
+        self.paktag = paktag
 

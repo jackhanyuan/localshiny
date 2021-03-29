@@ -132,8 +132,6 @@ def delete_user(username):
     close_db(db, cur)
     return True
 
-
-
 # ----------------------------------token相关-------------------------------
 # 获取token
 def get_token(username):
@@ -173,33 +171,40 @@ def update_token(username):
 
 
 # token验证：先解析出username和time，再从数据库中查询验证
-def verify_token(token):
+def verify_token(name, token):
     try:
         username, time_str = get_username_time_from_token(token)
+        if name != username:
+            # username does not match
+            tag = (False, 'username does not match.')
+            return tag
         if float(time_str) < time.time():
             # token expired
-            tag = (False, 'token expired.')
+            tag = (False, 'token expired, please copy new token and try again.')
+            update_token(username)
+            return tag
         token_in_database = get_token(username)
         if token != token_in_database:
             # token certification failed
-            tag = (False, 'token certification failed.')
+            tag = (False, 'token certification failed, please copy the correct token and try again.')
+            return tag
         # token certification success
         tag = (True, username)
     except:
-        tag = (False, 'token does not exist.')
+        tag = (False, 'token does not exist, please copy the correct token and try again.')
 
     return tag
 
 
 # ----------------------------------package相关----------------------------
-def create_package_data(pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, filename, fileurl):
+def create_package_data(pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, rversion, runcmd, filepath, fileurl):
     # 获取数据库链接，游标
     db, cur = get_db()
 
     # 向package表中插入上传的package相关信息
     cur.execute(
-        "INSERT INTO package (pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, filename, fileurl) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
-        [pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, filename, fileurl])
+        "INSERT INTO package (pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, rversion, runcmd, filepath, fileurl) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        [pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, rversion, runcmd, filepath, fileurl])
 
     # 提交事务，关闭数据库连接，游标，回收垃圾
     close_db(db, cur)
@@ -207,14 +212,14 @@ def create_package_data(pakid, pakname, pakauthor, version,  pakdesc, pakos, arc
     return True
 
 
-def update_package_data(pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, filename, fileurl):
+def update_package_data(pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, rversion, runcmd, filepath, fileurl):
     # 获取数据库链接，游标
     db, cur = get_db()
 
     # 向package表中插入上传的package相关信息
     cur.execute(
-        "UPDATE package SET pakname = ?, pakauthor = ?, version = ?,  pakdesc = ?, pakos = ?, arch = ?, distribution = ?, pakdate = ?, upmethod = ?, filename = ?, fileurl = ? where pakid = ?",
-        [pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, filename, fileurl, pakid])
+        "UPDATE package SET pakname = ?, pakauthor = ?, version = ?,  pakdesc = ?, pakos = ?, arch = ?, distribution = ?, pakdate = ?, upmethod = ?, rversion = ?, runcmd = ?, filepath = ?, fileurl = ? where pakid = ?",
+        [pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, rversion, runcmd, filepath, fileurl, pakid])
 
     # 提交事务，关闭数据库连接，游标，回收垃圾
     close_db(db, cur)
@@ -227,7 +232,7 @@ def get_package_data(pakid):
     db, cur = get_db()
     # 查询package_data
     package_data = cur.execute("SELECT * FROM package where pakid = ?",
-                                      [pakid]).fetchone()
+                               [pakid]).fetchone()
 
     # 提交事务，关闭数据库连接，游标，回收垃圾
     close_db(db, cur)
@@ -240,8 +245,8 @@ def delete_package_data(pakid):
     db, cur = get_db()
 
     # 要删除package的存储路径
-    filepath = cur.execute("SELECT filename FROM package where pakid = ?",
-                                  [pakid]).fetchone()[0]
+    filepath = cur.execute("SELECT filepath FROM package where pakid = ?",
+                           [pakid]).fetchone()[0]
 
     # 路径存在，则删除该package的文件
     if os.path.exists(filepath):
@@ -283,14 +288,14 @@ def del_file(filepath):
 
 
 # if __name__ == '__main__':
-#     delete_user('test')
+#     delete_user('python')
 #     get_data()
-    # print('-' * 50)
-    # user_register('haha1','test','test')
-    # print('-' * 50)
-    # get_data()
-    # print(get_token('haha'))
-    # print(update_token('haha'))
-    # print(get_token('haha'))
-    # print(verify_token(get_token('haha')))
+# print('-' * 50)
+# user_register('haha1','test','test')
+# print('-' * 50)
+# get_data()
+# print(get_token('haha'))
+# print(update_token('admin'))
+# print(get_token('haha'))
+# print(verify_token(get_token('haha')))
 

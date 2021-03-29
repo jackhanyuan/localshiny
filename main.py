@@ -6,9 +6,10 @@ import redis
 import shutil
 from tus.flask_tus import tus_manager
 from werkzeug.utils import secure_filename
-from database import get_db, user_register, verify_password, create_package_data, update_package_data, get_package_data, delete_package_data, create_temp_folder, del_file
+from database import get_db, user_register, verify_password, create_package_data, update_package_data, get_package_data, delete_package_data, create_temp_folder, del_file, get_token, verify_token, update_token
 from qtshiny import RegistrationForm, RShinyApp
 from token_id_gen import generate_short_id
+from xml_gen import generate_xml
 
 # 配置参数
 app = Flask(__name__)
@@ -63,7 +64,7 @@ def init_apps():
         # 从app表查询获取所有app的信息
         all_package = cur.execute("SELECT * FROM package").fetchall()
         for one_package in all_package:
-            package_dict[i] = RShinyApp(one_package[0], one_package[1], one_package[2], one_package[3], one_package[4], one_package[5], one_package[6], one_package[7], one_package[8], one_package[9], one_package[10], one_package[11])
+            package_dict[i] = RShinyApp(one_package[0], one_package[1], one_package[2], one_package[3], one_package[4], one_package[5], one_package[6], one_package[7], one_package[8], one_package[9], one_package[10], one_package[11], one_package[12], one_package[13], one_package[14], one_package[15])
             i += 1
 
         # 编号
@@ -71,7 +72,7 @@ def init_apps():
         # 从app表查询获取已登录用户所有app的信息
         all_my_package = cur.execute("SELECT * FROM package where pakauthor = ?", [session.get('username')]).fetchall()
         for one_package in all_my_package:
-            my_package_dict[i] = RShinyApp(one_package[0], one_package[1], one_package[2], one_package[3], one_package[4], one_package[5], one_package[6], one_package[7], one_package[8], one_package[9], one_package[10], one_package[11])
+            my_package_dict[i] = RShinyApp(one_package[0], one_package[1], one_package[2], one_package[3], one_package[4], one_package[5], one_package[6], one_package[7], one_package[8], one_package[9], one_package[10], one_package[11], one_package[12], one_package[13], one_package[14], one_package[15])
             i += 1
 
         # 提交事务，关闭数据库连接，游标，并回收垃圾
@@ -115,7 +116,14 @@ def apps():
 def myapps():
     # 先初始化已登录用户所有app的信息，参数传给myapps.html，再渲染页面
     init_apps()
-    return render_template('myapps.html', my_package_dict=my_package_dict, host = HOST)
+    user_token = None
+    logged_in = session.get('logged_in')
+    if logged_in:
+        username = session.get('username')
+        user_token = get_token(username)
+        return render_template('myapps.html', my_package_dict=my_package_dict, host = HOST, token = user_token)
+    else:
+        return redirect('/login')
 
 
 # register页面相关
@@ -146,7 +154,7 @@ def register():
 
             # 用户username已被注册
             else:
-                error = "That username is already taken, please choose another."
+                error = "username is already taken, please choose another."
 
         # GET请求、username已被注册，全部返回到注册页面
         return render_template('register.html', form=form, error=error)
@@ -224,22 +232,27 @@ def api_login():
 
         # 存储错误信息
         error = None
-        # 获取用户名密码
-        username = request.json.get('username')
-        password = request.json.get('password')
-        # 密码校验
-        login_tag = verify_password(username, password)
-        # 密码正确
-        if login_tag == 'True':
+
+        # 获取name和token
+        name_token = request.headers.environ['HTTP_TOKEN']
+        name = name_token.rsplit('-')[0]
+        token = name_token.rsplit('-')[1]
+        # 验证token
+        tag = verify_token(name, token)
+        login_tag = tag[0]
+        error = tag[1]
+
+        # token验证成功
+        if login_tag == True:
+            username = error
             # 通过session设置用户登录成功，并保存登录信息username
             session['logged_in'] = True
             session['username'] = username
             session.permanent = True
-            return (jsonify({'result': 1, 'description': str(session.get('username')) + ' Login successful.'}), 200)
-        # 用户不存在或密码错误
+            return (jsonify({'result': 1, 'description': username + ' login successful.'}), 200)
+        # token验证失败
         else:
-            error = login_tag
-            return (jsonify({'result': 0, 'description': 'Login failed, ' + login_tag + '.'}), 401)
+            return (jsonify({'result': 0, 'description': 'login failed, ' + error }), 401)
     except Exception as error:
         return (jsonify({'error': error}), 400)
 
@@ -250,7 +263,7 @@ def api_login_status():
     if logged_in:
         return (jsonify({'result': 1, 'description': str(session.get('username')) + ' already logged in.'}), 200)
     else:
-        return (jsonify({'result': 0, 'description': 'No user logged in.'}), 200)
+        return (jsonify({'result': 0, 'description': 'no user logged in.'}), 200)
 
 
 # logout相关
@@ -269,10 +282,11 @@ def api_logout():
         # 退出登陆，删除session变量值
         # session.pop('logged_in', None)
         # session.pop('username', None)
+        update_token(username)
         session.clear()
-        return (jsonify({'result': 1,'description': username + ' Logout successful.'}), 200)
+        return (jsonify({'result': 1,'description': username + ' logout successful.'}), 200)
     else:
-        return (jsonify({'result': 0, 'description': 'No user logged in.'}), 200)
+        return (jsonify({'result': 0, 'description': 'no user logged in.'}), 200)
 
 
 # 已登录用户上传app相关
@@ -300,6 +314,8 @@ def upload():
             distribution = 'None'
             pakdate = datetime.now().strftime('%Y-%m-%d')# 生成上传时间
             upmethod = 'web'
+            rversion = 'None'
+            runcmd = 'None'
 
             # 获取文件名
             temp_name = str(request.form.get('filename'))
@@ -308,17 +324,17 @@ def upload():
             # 最终app存储名字
             file_save_name = secure_filename(pakname + '-v' +version + '-' + pakos + '-' + arch +"." + temp_name.rsplit('.')[-1])
             # 最终app的存储路径，即 static/package/pakauthor/file_save_name
-            filename = os.path.join(os.path.join(UPLOAD_FOLDER, pakauthor), file_save_name)
+            filepath = os.path.join(os.path.join(UPLOAD_FOLDER, pakauthor), file_save_name)
             # 获取fileurl
-            fileurl = "/api/package/file/" + pakid
+            fileurl = "/api/package/xml/" + pakid
             # app的存储路径不存在且临时存储目录存在，表示app的文件已上传到临时目录，但没有转移到用户目录下
-            if not os.path.exists(filename) and os.path.exists(temp_path):
+            if not os.path.exists(filepath) and os.path.exists(temp_path):
                 # 把app的文件从临时目录中剪切到用户目录下
-                shutil.move(temp_path, filename)
+                shutil.move(temp_path, filepath)
                 # 清空临时存储目录
                 del_file(TEMP_FOLDER)
                 # 把app数据写入数据库
-                create_package_data(pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, filename, fileurl)
+                create_package_data(pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, rversion, runcmd, filepath, fileurl)
                 # 上传成功后，返回到用户app的页面
                 return redirect('/myapps')
             # app的存储路径已存在，或者临时目录中不存在已上传的文件（基本不存在），表示app已存在
@@ -351,6 +367,8 @@ def api_upload():
             distribution = 'None'
             pakdate = datetime.now().strftime('%Y-%m-%d')# 生成上传时间
             upmethod = 'api'
+            rversion = pakinfo['rversion']
+            runcmd = pakinfo['runcmd']
             # check if the post request has the file part
             if 'file' not in request.files:
                 resp = jsonify({'result': 0, 'description' : 'No file part in the request'})
@@ -364,12 +382,12 @@ def api_upload():
             if file and allowed_file(file.filename):
                 temp_name = secure_filename(file.filename)
                 file_save_name = secure_filename(pakname + '-v' +version + '-' + pakos + '-' + arch +"." + temp_name.rsplit('.')[-1])
-                filename = os.path.join(os.path.join(UPLOAD_FOLDER, pakauthor), file_save_name)
-                fileurl = "/api/package/file/" + pakid
+                filepath = os.path.join(os.path.join(UPLOAD_FOLDER, pakauthor), file_save_name)
+                fileurl = "/api/package/xml/" + pakid
                 # app的存储路径不存在
-                if not os.path.exists(filename):
-                    create_package_data(pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, filename, fileurl)
-                    file.save(filename)
+                if not os.path.exists(filepath):
+                    create_package_data(pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, rversion, runcmd, filepath, fileurl)
+                    file.save(filepath)
                     resp = jsonify({'result': 1, 'description' : 'File successfully uploaded.', 'pakid': pakid})
                     resp.status_code = 201
                 else:
@@ -414,11 +432,39 @@ def api_get_package(pakid):
 def api_get_package_info(pakid):
     try:
         package_data = get_package_data(pakid)
-        resp = jsonify({'result': 1, 'pakid': package_data[0], 'pakname': package_data[1], 'pakauthor': package_data[2], 'version': package_data[3], 'pakdesc': package_data[4], 'os': package_data[5], 'arch': package_data[6], 'pakdate': package_data[8], 'upmethod': package_data[9]})
+        resp = jsonify({'result': 1, 'pakid': package_data[0], 'pakname': package_data[1], 'pakauthor': package_data[2], 'version': package_data[3], 'pakdesc': package_data[4], 'os': package_data[5], 'arch': package_data[6], 'pakdate': package_data[8], 'upmethod': package_data[9], 'Rversion': package_data[11]})
         resp.status_code = 200
         return resp
     except Exception as error:
         resp = jsonify({'result': 0, 'description' : 'Package was not found'})
+        resp.status_code = 404
+        return resp
+
+
+@app.route('/api/package/xml/<pakid>', methods = ['GET','POST'])
+def api_get_xml(pakid):
+    try:
+        package_data = get_package_data(pakid)
+
+        pakname = package_data[1]
+        pakauthor = package_data[2]
+        version = package_data[3]
+        pakdesc = package_data[4]
+        pakos = package_data[5]
+        arch = package_data[6]
+        pakdate = package_data[8]
+        upmethod = package_data[9]
+        rversion = package_data[11]
+        runcmd = package_data[12]
+        filepath = package_data[-3]
+        fileurl = HOST +'/api/package/file/' + pakid
+
+        generate_xml(pakid, pakname, pakauthor, version, pakdesc, pakos, pakdate, upmethod, rversion, runcmd, fileurl)
+        xmlname = pakid + '.xml'
+        return send_from_directory(UPLOAD_FOLDER, 'result.xml', attachment_filename= xmlname, as_attachment=True)
+    except Exception as error:
+        # abort(404)
+        resp = jsonify({'result': 0, 'description' : 'XML was not found'})
         resp.status_code = 404
         return resp
 
@@ -455,11 +501,13 @@ def update_package(pakid):
             pakdesc = str(request.form.get('pakdesc'))
             pakos = str(request.form.get('pakos'))
             arch = str(request.form.get('arch'))
-            distribution = 'None'
+            distribution = package_data[7]
             pakdate = datetime.now().strftime('%Y-%m-%d')# 生成上传时间
             upmethod = package_data[9]
-            package_old_path = package_data[10]
-            fileurl = package_data[11]
+            rversion = package_data[11]
+            runcmd = package_data[12]
+            package_old_path = package_data[13]
+            fileurl = package_data[14]
 
             # 获取文件名
             temp_name = str(request.form.get('filename'))
@@ -471,27 +519,108 @@ def update_package(pakid):
                 # 最终app存储名字
                 file_save_name = secure_filename(pakname + '-v' +version + '-' + pakos + '-' + arch +"." + temp_name.rsplit('.')[-1])
                 # 最终app的存储路径，即 static/package/pakauthor/file_save_name
-                filename = os.path.join(os.path.join(UPLOAD_FOLDER, pakauthor), file_save_name)
+                filepath = os.path.join(os.path.join(UPLOAD_FOLDER, pakauthor), file_save_name)
 
                 # app的存储路径存在且上传文件的临时存储路径存在，覆盖原文件
                 if os.path.exists(package_old_path) and os.path.exists(temp_path):
                     # 在用户目录下删除app原本的文件
                     os.remove(package_old_path)
                     # 把更新的文件从临时目录中剪切到用户目录下
-                    shutil.move(temp_path, filename)
+                    shutil.move(temp_path, filepath)
                     # 清空临时存储目录
                     del_file(TEMP_FOLDER)
-                    # 更新package_data
-                    update_package_data(pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, filename, fileurl)
-                    # 更新成功后，返回到用户app的页面
-                    return redirect('/myapps')
-            # 文件名为空，用户没有上传文件，只更新pakdesc，修改即可
+            # 文件名为空，用户没有上传文件，更新package信息
             else:
-                update_package_data(pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, package_old_path, fileurl)
-                # 更新成功后，返回到用户app的页面
-                return redirect('/myapps')
+                # 最终app存储名字
+                file_save_name = secure_filename(pakname + '-v' +version + '-' + pakos + '-' + arch +"." + package_old_path.rsplit('.')[-1])
+                filepath = os.path.join(os.path.join(UPLOAD_FOLDER, pakauthor), file_save_name)
+                # 更新package存储路径
+                shutil.move(package_old_path, filepath)
+
+            # 更新package_data
+            update_package_data(pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, rversion, runcmd, filepath, fileurl)
+            # 更新成功后，返回到用户app的页面
+            return redirect('/myapps')
     except Exception as e:
         return str(e)
+
+
+@app.route('/api/update/<pakid>', methods=['POST'])
+def api_update(pakid):
+    try:
+        if session.get('logged_in'):
+            # 获取package_data
+            package_data = get_package_data(pakid)
+            pakauthor = package_data[2]
+            package_old_path = package_data[13]
+            fileurl = package_data[14]
+
+            # 如果package对应的用户与当前登陆用户不一致
+            logged_in_username = session.get('username')
+            if logged_in_username != pakauthor:
+                resp = jsonify({'result': 0, 'description' : 'Authentication failed, you are forbidden to modify this package.'})
+                resp.status_code = 401
+                return resp
+            else:
+                pakinfo = eval(request.form.to_dict()['info'])
+                pakname = pakinfo['pakname']
+                pakauthor = session.get('username')
+                version = pakinfo['version']
+                pakdesc = pakinfo['pakdesc']
+                # 变量名不能设置为os，否则会冲突
+                pakos = pakinfo['os']
+                arch = 'script'
+                distribution = 'None'
+                pakdate = datetime.now().strftime('%Y-%m-%d')# 生成上传时间
+                upmethod = 'api'
+                rversion = pakinfo['rversion']
+                runcmd = pakinfo['runcmd']
+
+                # check if the post request has the file part
+                if 'file' not in request.files:
+                    # 最终app存储名字
+                    file_save_name = secure_filename(pakname + '-v' +version + '-' + pakos + '-' + arch +"." + package_old_path.rsplit('.')[-1])
+                    filepath = os.path.join(os.path.join(UPLOAD_FOLDER, pakauthor), file_save_name)
+                    # 更新package存储路径
+                    shutil.move(package_old_path, filepath)
+                    # 更新package_data
+                    update_package_data(pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, rversion, runcmd, filepath, fileurl)
+                    resp = jsonify({'result': 1, 'description' : pakname + ' successfully updated.', 'pakid': pakid})
+                    resp.status_code = 201
+                    return resp
+
+                file = request.files['file']
+                if file.filename == '':
+                    resp = jsonify({'result': 0, 'description' : 'no file selected for uploading'})
+                    resp.status_code = 400
+                    return resp
+                if file and allowed_file(file.filename):
+                    temp_name = secure_filename(file.filename)
+                    file_save_name = secure_filename(pakname + '-v' +version + '-' + pakos + '-' + arch +"." + temp_name.rsplit('.')[-1])
+                    filepath = os.path.join(os.path.join(UPLOAD_FOLDER, pakauthor), file_save_name)
+
+                    # 在用户目录下删除package原文件
+                    os.remove(package_old_path)
+                    # 存储更新的文件
+                    file.save(filepath)
+                    # 更新package_data
+                    update_package_data(pakid, pakname, pakauthor, version,  pakdesc, pakos, arch, distribution, pakdate, upmethod, rversion, runcmd, filepath, fileurl)
+                    resp = jsonify({'result': 1, 'description' : pakname + ' successfully updated.', 'pakid': pakid})
+                    resp.status_code = 201
+
+                    return resp
+                else:
+                    resp = jsonify({'result': 0, 'description' : 'Allowed file types can only be zip.'})
+                    resp.status_code = 400
+                    return resp
+        else:
+            resp = jsonify({'result': 0, 'description' : 'Authentication failed.'})
+            resp.status_code = 401
+            return resp
+    except:
+        resp = jsonify({'result': 0, 'description' : 'Incorrect request format or Package was not found.'})
+        resp.status_code = 400
+        return resp
 
 
 # 已登录用户删除app相关
@@ -499,16 +628,52 @@ def update_package(pakid):
 @app.route('/delete/<pakid>')
 def delete_package(pakid):
     try:
-        # 获取当前已登录用户的username，即pakauthor
-        pakauthor = session.get('username')
-        # 从数据库删除package_data
-        delete_package_data(pakid)
-        # 删除成功后，返回到用户app的页面
+        # 获取package_data
+        package_data = get_package_data(pakid)
+        pakauthor = package_data[2]
+        logged_in_username = session.get('username')
+
+        # 如果app对应的用户和当前登陆用户一致则执行删除操作
+        if logged_in_username == pakauthor:
+            # 从数据库删除package_data
+            delete_package_data(pakid)
         return redirect('/myapps')
     except Exception as e:
         return str(e)
 
 
+@app.route('/api/delete/<pakid>', methods=['POST'])
+def api_delete(pakid):
+    try:
+        if session.get('logged_in'):
+            # 获取package_data
+            package_data = get_package_data(pakid)
+            pakname = package_data[1]
+            pakauthor = package_data[2]
+            logged_in_username = session.get('username')
+
+            # 如果app对应的用户和当前登陆用户一致则执行删除操作
+            if logged_in_username == pakauthor:
+                # 从数据库删除package_data
+                delete_package_data(pakid)
+                resp = jsonify({'result': 1, 'description' : pakname + ' successfully deleted.', 'pakid': pakid})
+                resp.status_code = 201
+            else:
+                resp = jsonify({'result': 0, 'description' : 'Authentication failed, you are forbidden to delete this package.'})
+                resp.status_code = 401
+            return resp
+        # 用户未登录
+        else:
+            resp = jsonify({'result': 0, 'description' : 'Authentication failed.'})
+            resp.status_code = 401
+            return resp
+    except Exception as error:
+        # abort(404)
+        resp = jsonify({'result': 0, 'description' : 'Package was not found.'})
+        resp.status_code = 404
+        return resp
+
+
 # --host=0.0.0.0 --port=5000    表明局域网内可以访问服务器，端口号为5000
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5050, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

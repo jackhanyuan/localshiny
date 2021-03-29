@@ -6,7 +6,7 @@ import hashlib
 
 
 # token生成
-def generate_token(username, expire=3600):
+def generate_token(username, expire=3600 * 24 * 7):
 	time_str = str(time.time() + expire)
 	time_byte = time_str.encode("utf-8")
 	sha1_user_str = hmac.new(username.encode("utf-8"), time_byte, 'sha1').hexdigest()
