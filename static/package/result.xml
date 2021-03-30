@@ -2,7 +2,7 @@
 <app>
   <head>
     <title>1</title>
-    <date>2021-03-30 04:22:16</date>
+    <date>2021-03-30 11:03:57</date>
     <icon />
     <pakid>1</pakid>
     <pakname>1</pakname>
@@ -11,7 +11,7 @@
     <pakdate>1</pakdate>
   </head>
   <install preferred="localShiny">
-    <localShiny pakVersion="1" RVersion="1" localShinyVersion="1.0">
+    <localShiny RVersion="1" localShinyVersion="1.0" pakVersion="1">
       <Rcommand>Rscript -e "args=commandArgs(TRUE);library(localShiny);installApp(args[1])" 1</Rcommand>
     </localShiny>
     <rportable>

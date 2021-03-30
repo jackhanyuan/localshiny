@@ -128,33 +128,37 @@ def doc():
 @app.route('/apps')
 def apps():
     # 获取installed_apps
-    ua_str = 'LocalShiny/qy59BctD-1.0.0,ZfEKirv7-0.99,'
+    # ua_str = 'LocalShiny/qy59BctD-1.0.0,ZfEKirv7-0.99,'
     ua_str = str(request.user_agent)
+    ua_tag = 0
     installed_apps = {}
     if 'LocalShiny' in ua_str:
         ls = ua_str.split(' ')[-1]
         apps = ls.split('/')[-1].split(',')
         apps = list(filter(None, set(apps)))  # 去重去空
+        ua_tag = 1
         for app in apps:
             pid, version = app.split('-')
             installed_apps[pid] = version
 
     # 先初始化所有app的信息，参数传给apps.html，再渲染页面
     init_apps(installed_apps)
-    return render_template('apps.html', package_dict=package_dict, host = HOST)
+    return render_template('apps.html', package_dict=package_dict, host = HOST, ua_tag = ua_tag)
 
 
 # 用户app页面相关
 @app.route('/myapps')
 def myapps():
     # 获取installed_apps
-    ua_str = 'LocalShiny/qy59BctD-1.0.0,ZfEKirv7-1.2,'
+    # ua_str = 'LocalShiny/qy59BctD-1.0.0,ZfEKirv7-1.2,'
     ua_str = str(request.user_agent)
+    ua_tag = 0
     installed_apps = {}
     if 'LocalShiny' in ua_str:
         ls = ua_str.split(' ')[-1]
         apps = ls.split('/')[-1].split(',')
         apps = list(filter(None, set(apps)))  # 去重去空
+        ua_tag = 1
         for app in apps:
             pid, version = app.split('-')
             installed_apps[pid] = version
@@ -167,7 +171,7 @@ def myapps():
     if logged_in:
         username = session.get('username')
         user_token = get_token(username)
-        return render_template('myapps.html', my_package_dict=my_package_dict, host = HOST, token = user_token)
+        return render_template('myapps.html', my_package_dict=my_package_dict, host = HOST, token = user_token, ua_tag = ua_tag)
     else:
         return redirect('/login')
 

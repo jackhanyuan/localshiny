@@ -35,13 +35,17 @@
         }
     </style>
     <script type="text/javascript">
-        function copyURL(pak_id) {
+        function copyURL(pak_id, ua_tag) {
             var text = document.getElementById("URL_" + pak_id).innerText;
             var input = document.getElementById("URLText");
-            input.value = '{{host}}' + text;
+            input.value = '{{ host }}' + text;
             input.select();//选中文本
             //执行浏览器复制命令
-            if(document.execCommand("copy")) {
+            if (ua_tag==1) {
+                document.execCommand("copy");
+            }
+            else {
+                document.execCommand("copy");
                 alert("复制成功");
             }
         }
@@ -68,9 +72,9 @@
                         <span>{{ package_dict[pak_id].pakos }}_{{ package_dict[pak_id].arch }} URL:</span>
                         <span id="URL_{{ pak_id }}">{{ package_dict[pak_id].fileurl }}</span>
                         {% if package_dict[pak_id].pakstatus == 'notinstall' %}
-                            <button class='myButton2' name='copylink' id={{host}}{{ package_dict[pak_id].fileurl }} onclick="copyURL({{ pak_id }})">Install</button>
+                            <button class='myButton2' name='copylink' id={{host}}{{ package_dict[pak_id].fileurl }} onclick="copyURL({{ pak_id }},{{ ua_tag }})">Install</button>
                         {% elif package_dict[pak_id].pakstatus == 'upgradeable' %}
-                            <button name='copylink' class='myButton2' id={{host}}{{ package_dict[pak_id].fileurl }} onclick="copyURL({{ pak_id }})">Update</button>
+                            <button name='copylink' class='myButton2' id={{host}}{{ package_dict[pak_id].fileurl }} onclick="copyURL({{ pak_id }},{{ ua_tag }})">Update</button>
                         {% elif package_dict[pak_id].pakstatus == 'installed' %}
                             <button name='copylink' class='myButton2' id={{host}}{{ package_dict[pak_id].fileurl }}>Installed</button>
                         {% endif %}
@@ -78,7 +82,7 @@
                     <div class="summary">
                         <p>{{ package_dict[pak_id].pakdesc[0:220] }}</p>
                     </div>
-{#                    <span class="book-number">{{ pak_id }}</span>#}
+                    {#                    <span class="book-number">{{ pak_id }}</span>#}
                 </section>
             {% endfor %}
         </div>
