@@ -13,7 +13,7 @@ UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static/package')
 
 
 # 数据库路径
-DATABASE = 'db/qtshiny.db'
+DATABASE = 'db/localshiny.db'
 
 
 # 获取数据库链接以及游标
@@ -250,7 +250,7 @@ def get_package_data(pakid):
     db, cur = get_db()
     # 查询package_data
     package_data = cur.execute("SELECT * FROM package where pakid = ?",
-                                      [pakid]).fetchone()
+                               [pakid]).fetchone()
 
     # 提交事务，关闭数据库连接，游标，回收垃圾
     close_db(db, cur)
@@ -276,7 +276,7 @@ def delete_package_data(pakid):
 
     # 要删除package的存储路径
     filepath = cur.execute("SELECT filepath FROM package where pakid = ?",
-                                  [pakid]).fetchone()[0]
+                           [pakid]).fetchone()[0]
 
     # 路径存在，则删除该package的文件
     if os.path.exists(filepath):
@@ -347,12 +347,12 @@ def del_file(filepath):
 #     get_data()
 #     print(get_pakid('idem3', 'admin3'))
 #     print(get_user_pakid('hello'))
-    # print('-' * 50)
-    # user_register('haha1','test','test')
-    # print('-' * 50)
-    # get_data()
-    # print(get_token('haha'))
-    # print(update_token('admin'))
-    # print(get_token('haha'))
-    # print(verify_token(get_token('haha')))
+# print('-' * 50)
+# user_register('haha1','test','test')
+# print('-' * 50)
+# get_data()
+# print(get_token('haha'))
+# print(update_token('admin'))
+# print(get_token('haha'))
+# print(verify_token(get_token('haha')))
 

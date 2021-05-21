@@ -17,7 +17,7 @@ class RegistrationForm(Form):
     confirm = PasswordField(u'Repeat Password',
                             [validators.DataRequired(), validators.EqualTo('password', message='Password must match.')], render_kw={'class': 'form-control', 'placeholder': u'Repeat Password'})
     # I accept it，布尔类型，必填项，✔后值为True
-    # accept_tos = BooleanField(u'I accept the site <a href='https://www.findn.cn:5000'>rules</a>', [validators.DataRequired()])
+    # accept_tos = BooleanField(u'I accept the site <a href='https://localshiny.org'>rules</a>', [validators.DataRequired()])
 
 
 # 定义app类，每个对象对应app表中的一个记录

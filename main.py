@@ -7,13 +7,13 @@ import shutil
 from tus.flask_tus import tus_manager
 from werkzeug.utils import secure_filename
 from database import get_db, user_register, verify_password, create_package_data, update_package_data, get_pakid, get_user_pakid, get_package_data, delete_package_data, is_v1_greater_than_v2, create_temp_folder, del_file, get_token, verify_token, update_token
-from qtshiny import RegistrationForm, RShinyApp
+from localshiny import RegistrationForm, RShinyApp
 from token_id_gen import generate_short_id
 from xml_gen import generate_xml
 
 # 配置参数
 app = Flask(__name__)
-app.debug = True
+# app.debug = True
 
 # 最大有效负载限制为 200MB (文件上传限制200M)
 app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024
@@ -35,7 +35,7 @@ Session(app)
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static/package')
 TEMP_FOLDER = os.path.join(os.path.dirname(__file__), 'temp')
 ALLOWED_EXTENSIONS = set(['zip'])
-HOST = 'http://localhost:5000'
+HOST = 'https://www.localshiny.org'
 LIMIT_PACKAGES_NUMBER = 10
 
 
@@ -212,20 +212,20 @@ def register():
         return str(error)
 
 
-@app.route('/api/register', methods=['POST'])
-def api_register():
-    try:
-        username = request.json.get('username')
-        email = request.json.get('email')
-        password = request.json.get('password')
-        if username is None or password is None or email is None:
-            return (jsonify({'result': 0, 'description': 'username & email & password can not be empty.'}), 400)
-        if user_register(username, password, email):
-            return (jsonify({'result': 1, 'description': username + ' register successful.'}), 201 )
-        else:
-            return (jsonify({'result': 0, 'description': 'existing user.'}), 200)
-    except Exception as error:
-        return (jsonify({'error': str(error)}), 400)
+# @app.route('/api/register', methods=['POST'])
+# def api_register():
+#     try:
+#         username = request.json.get('username')
+#         email = request.json.get('email')
+#         password = request.json.get('password')
+#         if username is None or password is None or email is None:
+#             return (jsonify({'result': 0, 'description': 'username & email & password can not be empty.'}), 400)
+#         if user_register(username, password, email):
+#             return (jsonify({'result': 1, 'description': username + ' register successful.'}), 201 )
+#         else:
+#             return (jsonify({'result': 0, 'description': 'existing user.'}), 200)
+#     except Exception as error:
+#         return (jsonify({'error': str(error)}), 400)
 
 
 # login页面相关
@@ -307,13 +307,13 @@ def api_login():
         return (jsonify({'error': error}), 400)
 
 
-@app.route('/api/status', methods=['POST'])
-def api_login_status():
-    logged_in = session.get('logged_in')
-    if logged_in:
-        return (jsonify({'result': 1, 'description': str(session.get('username')) + ' already logged in.'}), 200)
-    else:
-        return (jsonify({'result': 0, 'description': 'no user logged in.'}), 200)
+# @app.route('/api/status', methods=['POST'])
+# def api_login_status():
+#     logged_in = session.get('logged_in')
+#     if logged_in:
+#         return (jsonify({'result': 1, 'description': str(session.get('username')) + ' already logged in.'}), 200)
+#     else:
+#         return (jsonify({'result': 0, 'description': 'no user logged in.'}), 200)
 
 
 # logout相关
@@ -426,9 +426,9 @@ def api_upload():
                 tag = 0
             count_package = len(get_user_pakid(pakauthor))
             if count_package > LIMIT_PACKAGES_NUMBER:
-	            resp = jsonify({'result': 0, 'description' : 'You have more than {0} packages.'.format(LIMIT_PACKAGES_NUMBER)})
-	            resp.status_code = 400
-	            return resp
+                resp = jsonify({'result': 0, 'description' : 'You have more than {0} packages.'.format(LIMIT_PACKAGES_NUMBER)})
+                resp.status_code = 400
+                return resp
             version = pakinfo['version']
             pakdesc = pakinfo['pakdesc']
             # 变量名不能设置为os，否则会冲突
@@ -502,13 +502,13 @@ def api_get_package(pakid):
         return send_from_directory(folder, filename, attachment_filename= filename, as_attachment=True)
     except Exception as error:
         # abort(404)
-        resp = jsonify({'result': 0, 'description' : 'Package was not found'})
+        resp = jsonify({'result': 0, 'description': 'Package was not found'})
         resp.status_code = 404
         return resp
         # return str(error)
 
 
-@app.route('/api/package/info/<pakid>', methods = ['GET','POST'])
+@app.route('/api/package/info/<pakid>', methods=['GET', 'POST', 'HEAD'])
 def api_get_package_info(pakid):
     try:
         package_data = get_package_data(pakid)
@@ -525,7 +525,6 @@ def api_get_package_info(pakid):
 def api_get_xml(pakid):
     try:
         package_data = get_package_data(pakid)
-
         pakname = package_data[1]
         pakauthor = package_data[2]
         version = package_data[3]
@@ -570,7 +569,7 @@ def update_package(pakid):
         # GET请求，查找要更新app的相关信息
         if request.method == 'GET':
             # 把获取的信息返回给update.html中，方便用户更新
-            return render_template('update.html', pakid = package_data[0], pakname = package_data[1], pakauthor =package_data[2] , version = package_data[3], pakdesc=package_data[4], pakos = package_data[5], arch = package_data[6])
+            return render_template('update.html', pakid = package_data[0], pakname = package_data[1], pakauthor =package_data[2] , version = package_data[3], pakdesc=package_data[4], pakos = package_data[5], arch = package_data[6], rversion = package_data[11], runcmd = package_data[12])
 
         # POST请求，用户更新app
         if request.method == 'POST':
@@ -579,13 +578,17 @@ def update_package(pakid):
             pakauthor = str(session.get('username')) # app作者，即已登录用户的username
             version = str(request.form.get('version'))
             pakdesc = str(request.form.get('pakdesc'))
-            pakos = str(request.form.get('pakos'))
-            arch = str(request.form.get('arch'))
+            # pakos = str(request.form.get('pakos'))
+            # arch = str(request.form.get('arch'))
+            pakos = package_data[5]
+            arch = 'script'
             distribution = package_data[7]
             pakdate = datetime.now().strftime('%Y-%m-%d')# 生成上传时间
             upmethod = package_data[9]
-            rversion = package_data[11]
-            runcmd = package_data[12]
+            # rversion = package_data[11]
+            # runcmd = package_data[12]
+            rversion = str(request.form.get('rversion'))
+            runcmd = str(request.form.get('runcmd'))
             package_old_path = package_data[13]
             fileurl = package_data[14]
 
@@ -722,36 +725,36 @@ def delete_package(pakid):
         return str(e)
 
 
-@app.route('/api/delete/<pakid>', methods=['POST'])
-def api_delete(pakid):
-    try:
-        if session.get('logged_in'):
-            # 获取package_data
-            package_data = get_package_data(pakid)
-            pakname = package_data[1]
-            pakauthor = package_data[2]
-            logged_in_username = session.get('username')
-
-            # 如果app对应的用户和当前登陆用户一致则执行删除操作
-            if logged_in_username == pakauthor:
-                # 从数据库删除package_data
-                delete_package_data(pakid)
-                resp = jsonify({'result': 1, 'description' : pakname + ' successfully deleted.', 'pakid': pakid})
-                resp.status_code = 201
-            else:
-                resp = jsonify({'result': 0, 'description' : 'Authentication failed, you are forbidden to delete this package.'})
-                resp.status_code = 401
-            return resp
-        # 用户未登录
-        else:
-            resp = jsonify({'result': 0, 'description' : 'Authentication failed.'})
-            resp.status_code = 401
-            return resp
-    except Exception as error:
-        # abort(404)
-        resp = jsonify({'result': 0, 'description' : 'Package was not found.'})
-        resp.status_code = 404
-        return resp
+# @app.route('/api/delete/<pakid>', methods=['POST'])
+# def api_delete(pakid):
+#     try:
+#         if session.get('logged_in'):
+#             # 获取package_data
+#             package_data = get_package_data(pakid)
+#             pakname = package_data[1]
+#             pakauthor = package_data[2]
+#             logged_in_username = session.get('username')
+#
+#             # 如果app对应的用户和当前登陆用户一致则执行删除操作
+#             if logged_in_username == pakauthor:
+#                 # 从数据库删除package_data
+#                 delete_package_data(pakid)
+#                 resp = jsonify({'result': 1, 'description' : pakname + ' successfully deleted.', 'pakid': pakid})
+#                 resp.status_code = 201
+#             else:
+#                 resp = jsonify({'result': 0, 'description' : 'Authentication failed, you are forbidden to delete this package.'})
+#                 resp.status_code = 401
+#             return resp
+#         # 用户未登录
+#         else:
+#             resp = jsonify({'result': 0, 'description' : 'Authentication failed.'})
+#             resp.status_code = 401
+#             return resp
+#     except Exception as error:
+#         # abort(404)
+#         resp = jsonify({'result': 0, 'description' : 'Package was not found.'})
+#         resp.status_code = 404
+#         return resp
 
 
 @app.route('/api/delete/<pakname>', methods=['POST'])
@@ -781,7 +784,6 @@ def api_delete_by_pakname(pakname):
         return resp
 
 
-
 # --host=0.0.0.0 --port=5000    表明局域网内可以访问服务器，端口号为5000
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000)

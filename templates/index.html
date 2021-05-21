@@ -16,57 +16,46 @@
 
 {% extends 'base.html' %}
 {% block content %}
-    <!--main标签，规定文档的主要内容-->
-    <main class="home">
-        <!--文字内容-->
-        <h1 id="bookdown">RShinyDown</h1>
-        <h2 id="write-html-pdf-epub-and-kindle-books-with-r-markdown">Write HTML, PDF, ePub, and Kindle books with R
-            Markdown</h2>
-        <p><!-- raw HTML omitted --></p>
-        <p>The <strong>bookdown</strong> package is an <a href="https://github.com/rstudio/bookdown">open-source R
-            package</a> that facilitates writing books and long-form articles/reports with R Markdown. Features include:
-        </p>
-        <ul>
-            <li>Generate printer-ready books and ebooks from R Markdown documents.</li>
-            <li>A markup language easier to learn than LaTeX, and to write elements such as section headers, lists,
-                quotes,
-                figures, tables, and citations.
-            </li>
-            <li>Multiple choices of output formats: PDF, LaTeX, HTML, EPUB, and Word.</li>
-            <li>Possibility of including dynamic graphics and interactive applications (HTML widgets and Shiny apps).
-            </li>
-            <li>Support a wide range of languages: R, C/C++, Python, Fortran, Julia, Shell scripts, and SQL, etc.</li>
-            <li>LaTeX equations, theorems, and proofs work for all output formats.</li>
-            <li>Can be published to GitHub, bookdown.org, and any web servers.</li>
-            <li>Integrated with the RStudio IDE.</li>
-            <li>One-click publishing to https://bookdown.org.</li>
-        </ul>
-        <p>Below is a list of featured books. For a full list, please see the <a href="./">archive</a> page. For the
-            full documentation of the <strong>bookdown</strong> package, please see the free <a
-                    href="https://bookdown.org/yihui/bookdown/">online book</a> <em>bookdown: Authoring Books and
-                Technical
-                Documents with R Markdown</em>.</p>
-
-        <div>
-            <a href="/static/qtshiny/RShiny_Windows_64.txt" download="RShiny_Windows_64.txt">
-                <img src="/static/img/windows.png" alt="RShiny_for_windows_x64"
-                     style="width: 50px; height: 50px;" title="RShiny_for_windows_x64">
-                RShiny_for_windows_x64
-            </a>
-            <br>
-            <a href="/static/qtshiny/RShiny_Mac.txt" download="RShiny_Mac.txt">
-                <img src="/static/img/macos.png" alt="RShiny_for_macOS"
-                     style="width: 50px; height: 50px;" title="RShiny_for_macOS">
-                RShiny_for_macOS
-            </a>
-            <br>
-            <a href="/static/qtshiny/RShiny_Linux.txt" download="RShiny_Linux.txt">
-                <img src="/static/img/linux.png" alt="RShiny_for_linux"
-                     style="width: 50px; height: 50px;" title="RShiny_for_linux">
-                RShiny_for_linux
-            </a>
-        </div>
-    </main>
+<!--main标签，规定文档的主要内容-->
+<main class="home">
+    <!--文字内容-->
+    <h1 id="bookdown">LocalShiny</h1>
+    <h2 id="write-html-pdf-epub-and-kindle-books-with-r-markdown">Auto deploy Shiny apps locally</h2>
+    <p><!-- raw HTML omitted --></p>
+    <p>The <strong>LocalShiny</strong> is an <a href="https://github.com">open-source kit</a> that can help developers share their <a href="https://shiny.rstudio.com/gallery/">Shiny</a> applications online and help users install these Shiny applications locally. It includes <em>the LocalShiny Web, the LocalShiny R package (for developers), and the LocalShiny Software (for users)</em>.</p>
+    <p>Features include:</p>
+    <ul>
+        <li><strong>Security:</strong> Install Shiny applications locally, so you don’t have to worry about privacy leaks.</li>
+        <li><strong>Automatically Install:</strong> Even if you don't know anything about the program, you can easily install the Shiny app with LocalShiny Software without having to install any dependencies manually.</li>
+        <li><strong>Easily Share:</strong> LocalShiny web serves as a platform for developers to share shiny applications built in R. With the LocalShiny package, developers create clones of applications and share the applications in the cloud easily.</li>
+    </ul>
+    <p>If you are developer, click <a href="/doc">Documentation</a> to view detailed instructions.</p>
+    <p>If you are user, click <a href="/apps">All apps</a> to view LocalShiny App Store.</p>
+    <p>Click <a href="/about">About</a> to view details of us.</p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <h2>Download LocalShiny Software</h2>
+    <div>
+        <a href="/static/localshiny/LocalShiny_Software_Windows_64.txt" download="LocalShiny_Software_Windows_64.txt">
+            <img src="/static/img/windows.svg" alt="LocalShiny_Software_for_Windows_x64"
+                 style="width: 40px; height: 40px;" title="LocalShiny_Software_for_Windows_x64">
+            LocalShiny_Software_for_Windows_x64
+        </a>
+        <br>
+        <a href="/static/localshiny/LocalShiny_Software_macOS.txt" download="LocalShiny_Software_macOS.txt">
+            <img src="/static/img/macos.png" alt="LocalShiny_Software_for_macOS"
+                 style="width: 40px; height: 40px;" title="LocalShiny_Software_for_macOS">
+            LocalShiny_Software_for_macOS
+        </a>
+        <br>
+        <a href="/static/localshiny/LocalShiny_Software_Ubuntu.txt" download="LocalShiny_Software_Ubuntu.txt">
+            <img src="/static/img/ubuntu.svg" alt="LocalShiny_Software_for_Ubuntu"
+                 style="width: 40px; height: 40px;" title="LocalShiny_Software_for_Ubuntu">
+            LocalShiny_Software_for_ubuntu
+        </a>
+    </div>
+</main>
 {% endblock content %}
 
 </body>

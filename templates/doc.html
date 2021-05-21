@@ -16,15 +16,95 @@
 
 {% extends 'base.html' %}
 {% block content %}
-    <div class="article-meta">
-        <h1><span class="title">Documentation</span></h1>
-    </div>
-    <main class="single">
-        <p>The <a href="https://github.com/rstudio/bookdown"><strong>bookdown</strong></a> package is a free and open-source R package built on top of <a href="http://rmarkdown.rstudio.com">R Markdown</a> to make it really easy to write books and long-form articles/reports. Markdown is a very simple language but made powerful thanks to <a href="http://pandoc.org">Pandoc</a>, and <strong>bookdown</strong> has added a few important missing features related to writing books, such as figure/table caption numbering and cross-references, and embedding <a href="https://htmlwidgets.org">HTML widgets</a> or <a href="https://shiny.rstudio.com">Shiny apps</a>. We have tried hard to make everything work for all output formats (PDF, HTML, and EPUB, etc), so your readers can choose their favorite file format to read. Although the <strong>bookdown</strong> package was developed using R, it does not mean your book have to be related to R at all. You can certainly write poems or novels with <strong>bookdown</strong>!</p>
-        <h2 id="about-bookdownorg">...</h2>
-        <p></p>
-    </main>
-{% endblock content %}
+<div class="article-meta">
+    <h1><span class="title">For Developer</span></h1>
+</div>
+<main class="single">
+    <h2><strong>Getting started with LocalShiny</strong></h2>
+    <h2>1. Create an LocalShiny account</h2>
+    <p>LocalShiny is a platform hosting Shiny web apps (applications). If you are planning deploy your applications to the cloud, you need to sign up a LocalShiny account.</p>
+    <ul>
+        <li>1.1 In the upper-right corner of any page, click log in, then click register.</li>
+        <li>1.2 Register a new account using your username, password and an email address. Your account name is required to be unique, as is the domain name for all of your apps. Password is 6 or more characters, with no spaces. Then verify your email address. This verification allows you to retrieve your username or reset your password.</li>
+    </ul>
 
+    <h2>2. Deploy Applications</h2>
+    <p>There are two ways that you can deploy your Shiny web apps. The easiest is to upload a standalone desktop application via website directly. The users installing it need not have R and any other required packages to install and run the app. It is a portable version of app.</p>
+    <p>At first, bundle the app you wish to distribute as a standalone desktop application, with an installer file. The application files must be provided in zip format. Then log into the LocalShiny website, go to your account profile and click the New App below.</p>
+    <p>After that, a window will pop up that shows all required information to deploy an app. Click menu bar choices to access various setting options for application configuration. Select application files you wish to deploy and then click Submit. </p>
+    <p>Now, you have successfully uploaded an app in the website.</p>
+    <p><strong>The second method</strong> uses the R package LocalShiny to deploy Shiny web apps. In this way, you need to install this package first, and then configure it to access to your account, after which you can deploy applications with LocalShiny::loginAccount().</p>
+
+    <h2>• Install LocalShiny</h2>
+    <p>LocalShiny is an R package used to deploy Shiny web apps to hosted service. Its source codes are available on GitHub ( https://github.com/xxx).</p>
+
+    <h2>• Supported os:</h2>
+    <p>Windows, Linux and Mac OS are currently supported.</p>
+
+    <h2>• Dependencies:</h2>
+    <p>renv: 	https://rstudio.github.io/renv/</p>
+    <p>RCrul:	https://CRAN.R-project.org/package=RCurl</p>
+    <p>jsonlite:	https://CRAN.R-project.org/package=jsonlites</p>
+    <p>zip:	https://CRAN.R-project.org/package=zip</p>
+
+    <h2>• Installation:</h2>
+    <p>You can install the released version of LocalShiny from GitHub with:</p>
+    <p><strong>#install package dependencies</strong></p>
+    <code>install.packages(c("renv", "RCurl", "jsonlite", "zip"))</code>
+    <p><strong>#install.packages("devtools")</strong></p>
+    <code>devtools::install_github("xxx/LocalShiny")</code>
+    <p><strong>After the package has been installed, load it into your R session.</strong> </p>
+    <code>library(LocalShiny)</code>
+
+    <h2>• Configure LocalShiny</h2>
+    <p>You must configure the LShiny package before you deploy applications to the cloud. Once you set up an account in LocalShiny web, the database will automatically generate a contiguous sequence of characters as token used to authorize your account. The token is listed on your account profile. You can copy the token and use LShiny::loginAccount() to configure the package so as to access to your account. </p>
+    <p>Once you log out your account, the token will be no longer valid and you need to retrieve a new one from the LocalShiny website and configure the package again. </p>
+
+    <h2>• Deploy applications</h2>
+    <p>Once you have configured the LocalShiny package, you can use the function LocalShiny::deployApp() to upload Shiny apps under your own account. In this function, the state of a project's R package dependencies will be captured and stored in a lock file. This lock file will be uploaded together with other application files and can be used to later restore these application's dependencies as required. In the Example part of this guide, we will show how to deploy an application in detail.</p>
+
+    <h2>3. Update applications</h2>
+    <p>The number of applications within your account will be limited to no more than 10. If you make changes to your code or app information, you can update it. You CANNOT update your app’s name. Update the app’s name, you need to delete it and deploy a new one.</p>
+    <p>There are also two ways to update apps. In the website, click update, then you update app’s contents listing on the window.</p>
+    <p>You can also use LocalShiny::deployApp() to update it. If the app name is set as same as that of the application deployed before, you will update it. With this function, you can update app’s description, version, operation system and so on. </p>
+    <p><strong>#“path_shiny” is set as your app directory.</strong></p>
+    <p><strong># If the name is as same as before, you can update it.</strong></p>
+    <code>LocalShiny::deployApp(username=”example”,project=”path_shiny”,name=”source”)</code>
+    <p><strong>#update the app’s name</strong></p>
+    <code>LShiny::deployApp(username=”example”, project=”path_shiny”, name=”source1”)</code>
+
+    <h2>4. Delete applications</h2>
+    <p>Rremoving an app is much easier. You can delete an app on LocalShiny website by clicking the button delete,or delete apps with LShiny::deleteApp() command. To use it, run</p>
+    <p><strong># if you want to delete app “source”</strong></p>
+    <code># LocalShiny::loginAccount(“example”, token=example_token)</code>
+    <code>LShiny::deleteApp(“standalone”)</code>
+
+    <h2>5. Example</h2>
+    <p>Here comes an example to show how applications are deployed via the LShiny package. In general, you can successfully upload your own Shiny apps by following the steps mentioned below.</p>
+    <p><strong>1) Log in your account at RShiny website</strong></p>
+    <p>The user needs to log in by clicking 'login' link at the top-right corner of the page. The first time you sign in, RShiny prompts you to set up your account.</p>
+    <p><strong>2) Install the LocalShiny R package from github</strong></p>
+    <code>devtools::install_github("xxx/LocalShiny")</code>
+    <p><strong>3) Use the token listed on your account profile to configure the LShiny package.</strong></p>
+    <p>Copy the token then paste it into the R console. Run the command to configure the package: </p>
+    <code>LShiny::loginAccount(“example”,token=“MTYxNzkzOTc2OC4yMDQ2OTc2LWFhZDk2MjkwMWZkNTBkNDY2YjE4YmI1MjAxZDVjZDkzYjc1OGI0NjktZXhhbXBsZQ==”)</code>
+    <p><strong>4) Prepare a shiny application that works</strong></p>
+    <p><strong>server.R</strong></p>
+    {% raw %}
+    <p># Define server logic to summarize and view selected dataset ---- server <- function(input, output) {# Return the requested dataset ---- datasetInput <- reactive({ switch(input$dataset, "rock" = rock, "pressure" = pressure, "cars" = cars) }) # Generate a summary of the dataset ---- output$summary <- renderPrint({ dataset <- datasetInput() summary(dataset) }) # Show the first "n" observations ---- output$view <- renderTable({ head(datasetInput(), n = input$obs) }) }</p>
+    <p><strong>ui.R</strong></p>
+    <code># Define UI for dataset viewer app ---- ui <- fluidPage( # App title ---- titlePanel("Shiny Text"), # Sidebar layout with a input and output definitions ---- sidebarLayout( # Sidebar panel for inputs ---- sidebarPanel( # Input: Selector for choosing dataset ---- selectInput(inputId = "dataset", label = "Choose a dataset:", choices = c("rock", "pressure", "cars")), # Input: Numeric entry for number of obs to view ---- numericInput(inputId = "obs", label = "Number of observations to view:", value = 10)), # Main panel for displaying outputs ---- mainPanel( # Output: Verbatim text for data summary ---- verbatimTextOutput("summary"), # Output: HTML table with requested number of observations ---- tableOutput("view") ) ) )</code>
+    {% endraw %}
+    <p>Test that your application works by running it locally. Set your working directory to your app directory, and then run:</p>
+    <code>library(shiny)</code>
+    <code>runApp()</code>
+    <p>If the application works, let’s upload it to the LocalShiny website.</p>
+
+    <p><strong>5) Deploy apps with LocalShiny::deployApp()</strong></p>
+    <p>#“path_shiny” is set as your app directory.</p>
+    <code>LocalShiny::deployApp(username=”example”,project=”path_shiny”,name=”source”)</code>
+    <p>Congratulations! You’ve deployed your first application named ”source”.</p>
+</main>
+{% endblock content %}
 </body>
 </html>

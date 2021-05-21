@@ -1,32 +1,34 @@
 <?xml version='1.0' encoding='utf-8'?>
 <app>
   <head>
-    <title>1</title>
-    <date>2021-03-30 11:03:57</date>
+    <title>git</title>
+    <date>2021-05-17 11:45:31</date>
     <icon />
-    <pakid>1</pakid>
-    <pakname>1</pakname>
-    <pakauthor>1</pakauthor>
-    <description>1</description>
-    <pakdate>1</pakdate>
+    <pakid>S1QoSTgQ</pakid>
+    <pakname>git</pakname>
+    <pakauthor>python</pakauthor>
+    <description>This is an application named 'git' !</description>
+    <pakdate>2021-05-13</pakdate>
   </head>
   <install preferred="localShiny">
-    <localShiny RVersion="1" localShinyVersion="1.0" pakVersion="1">
-      <Rcommand>Rscript -e "args=commandArgs(TRUE);library(localShiny);installApp(args[1])" 1</Rcommand>
+    <localShiny pakVersion="1.0" RVersion="4.0.5" localShinyVersion="1.0">
+      <Rcommand>Rscript -e "args=commandArgs(TRUE);library(localshiny);installApp(args[1])" S1QoSTgQ</Rcommand>
     </localShiny>
     <rportable>
-      <Windows OSVersion="Windows10" RVersion="4.0.4">
-        <url>http://www.findn.cn:5000/static/qtshiny/R-Windows-4.0.4.zip</url>
+      <Windows OSVersion="" RVersion="">
+        <url>https://cloud.r-project.org/bin/windows/base/old/4.0.5/R-4.0.5-win.exe</url>
+        <Rtools64>https://cran.r-project.org/bin/windows/Rtools/rtools40v2-x86_64.exe</Rtools64>
+        <Rtools32>https://cran.r-project.org/bin/windows/Rtools/rtools40-i686.exe</Rtools32>
       </Windows>
-      <macOS OSVersion="" RVersion="4.0.4">
-        <url />
+      <macOS OSVersion="" RVersion="">
+        <url>https://cloud.r-project.org/bin/macosx/R-4.0.5.pkg</url>
       </macOS>
-      <Linux OSVersion="" RVersion="4.0.4">
-        <url />
-      </Linux>
+      <Ubuntu OSVersion="" RVersion="">
+        <url>http://cloud.r-project.org/src/base/R-4/R-4.0.5.tar.gz</url>
+      </Ubuntu>
     </rportable>
   </install>
   <run>
-    <Rcommand>1</Rcommand>
+    <Rcommand>git.R</Rcommand>
   </run>
 </app>

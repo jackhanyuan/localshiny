@@ -46,7 +46,7 @@
             }
             else {
                 document.execCommand("copy");
-                alert("复制成功");
+                alert("Link copy successfully, please paste in LocalShiny client to install this app.");
             }
         }
     </script>
@@ -56,37 +56,49 @@
 <input type="text" id="URLText">
 {% extends 'base.html' %}
 {% block content %}
-    <main class="">
-        <p>Below is a list of books written with <strong>bookdown</strong>, including those published to bookdown.org (books without substantial content are excluded) and a few hosted on external servers. The books are ordered roughly by date. An asterisk <code>*</code> after a date indicates the date is unknown, which often means a <code>date</code> field is missing in the YAML metadata of the source document <code>index.Rmd</code>. The list of books is automatically generated. For more information (including how to add or remove your books on this page), please see the <a href="../about">About</a> page.</p>
+<main class="">
+    <h2><span class="title">Welcome to the LocalShiny App Store!</span></h2>
+    <p>It is a safe and trusted place to discover and download apps. We focus on bringing you convenience to share your apps on the website and ensuring that the apps we offer are held to the highest standards for security. All apps in store need to be open-source. </p>
 
-        <div class="item-list" id="itemlist">
-            {% for pak_id in package_dict %}
-                <section class="article-list">
-                    <h1>{{ package_dict[pak_id].pakname }}</h1>
-                    <h2 class="list-meta" style="font-size: 1em;">
-                        <span>By {{ package_dict[pak_id].pakauthor }}</span>
-                        <span>Version: {{ package_dict[pak_id].version }}</span>
-                        <span>{{ package_dict[pak_id].pakdate }}</span>
-                    </h2>
-                    <div class="list-meta" style="border-bottom: 1px solid #ddd">
-                        <span>{{ package_dict[pak_id].pakos }}_{{ package_dict[pak_id].arch }} URL:</span>
-                        <span id="URL_{{ pak_id }}">{{ package_dict[pak_id].fileurl }}</span>
-                        {% if package_dict[pak_id].pakstatus == 'notinstall' %}
-                            <button class='myButton2' name='copylink' id={{host}}{{ package_dict[pak_id].fileurl }} onclick="copyURL({{ pak_id }},{{ ua_tag }})">Install</button>
-                        {% elif package_dict[pak_id].pakstatus == 'upgradeable' %}
-                            <button name='copylink' class='myButton2' id={{host}}{{ package_dict[pak_id].fileurl }} onclick="copyURL({{ pak_id }},{{ ua_tag }})">Update</button>
-                        {% elif package_dict[pak_id].pakstatus == 'installed' %}
-                            <button name='copylink' class='myButton2' id={{host}}{{ package_dict[pak_id].fileurl }}>Installed</button>
-                        {% endif %}
-                    </div>
-                    <div class="summary">
-                        <p>{{ package_dict[pak_id].pakdesc[0:220] }}</p>
-                    </div>
-                    {#                    <span class="book-number">{{ pak_id }}</span>#}
-                </section>
-            {% endfor %}
-        </div>
-    </main>
+    <div class="item-list" id="itemlist">
+        {% for pak_id in package_dict %}
+        <section class="article-list">
+            <h1 class="list-meta">
+                <span>{{ package_dict[pak_id].pakname }}</span>
+                <span id="URL_{{ pak_id }}" style="display:none;">{{ package_dict[pak_id].fileurl }}</span>
+                {% if package_dict[pak_id].pakstatus == 'notinstall' %}
+                    <button class='myButton2' name='copylink' id={{host}}{{ package_dict[pak_id].fileurl }} onclick="copyURL({{ pak_id }},{{ ua_tag }})">Install</button>
+                {% elif package_dict[pak_id].pakstatus == 'upgradeable' %}
+                    <button name='copylink' class='myButton2' id={{host}}{{ package_dict[pak_id].fileurl }} onclick="copyURL({{ pak_id }},{{ ua_tag }})">Update</button>
+                {% elif package_dict[pak_id].pakstatus == 'installed' %}
+                    <button name='copylink' class='myButton2' id={{host}}{{ package_dict[pak_id].fileurl }}>Installed</button>
+                {% endif %}
+            </h1>
+            <h2 class="list-meta" style="font-size: 1em;">
+                <span>Author: {{ package_dict[pak_id].pakauthor }}</span>
+                <span>ID: {{ package_dict[pak_id].pakid }}</span>
+                <span>Version: {{ package_dict[pak_id].version }}</span>
+                <span>{{ package_dict[pak_id].pakdate }}</span>
+            </h2>
+            <div class="list-meta" style="border-bottom: 1px solid #ddd">
+{#                <span>{{ package_dict[pak_id].pakos }}_{{ package_dict[pak_id].arch }} URL:</span>#}
+{#                <span id="URL_{{ pak_id }}">{{ package_dict[pak_id].fileurl }}</span>#}
+{#                {% if package_dict[pak_id].pakstatus == 'notinstall' %}#}
+{#                <button class='myButton2' name='copylink' id={{host}}{{ package_dict[pak_id].fileurl }} onclick="copyURL({{ pak_id }},{{ ua_tag }})">Install</button>#}
+{#                {% elif package_dict[pak_id].pakstatus == 'upgradeable' %}#}
+{#                <button name='copylink' class='myButton2' id={{host}}{{ package_dict[pak_id].fileurl }} onclick="copyURL({{ pak_id }},{{ ua_tag }})">Update</button>#}
+{#                {% elif package_dict[pak_id].pakstatus == 'installed' %}#}
+{#                <button name='copylink' class='myButton2' id={{host}}{{ package_dict[pak_id].fileurl }}>Installed</button>#}
+{#                {% endif %}#}
+            </div>
+            <div class="summary">
+                <p>{{ package_dict[pak_id].pakdesc[0:220] }}</p>
+            </div>
+            {#                    <span class="book-number">{{ pak_id }}</span>#}
+        </section>
+        {% endfor %}
+    </div>
+</main>
 {% endblock content %}
 
 </body>

@@ -6,9 +6,10 @@ from xml.etree.ElementTree import SubElement
 from xml.etree.ElementTree import ElementTree
 import os
 from datetime import datetime
+from database import is_v1_greater_than_v2
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static/package')
-HOST = 'http://www.findn.cn:5000'
+HOST = 'http://localshiny.org'
 
 
 # Return a pretty-printed version of the xml
@@ -71,24 +72,40 @@ def generate_xml(pakid, pakname, pakauthor, version, pakdesc, pakos, pakdate, up
 		package_url.text = fileurl
 	else:
 		# generate second install-child-node localShiny
-		local_shiny = SubElement(install, 'localShiny', attrib={'pakVersion': version, 'RVersion': rversion, 'localShinyVersion': '1.0'})
+		local_shiny = SubElement(install, 'localShiny',
+		                         attrib={'pakVersion': version, 'RVersion': rversion, 'localShinyVersion': '1.0'})
 		command1 = SubElement(local_shiny, 'Rcommand')
-		command1.text = 'Rscript -e "args=commandArgs(TRUE);library(localShiny);installApp(args[1])" {0}'.format(pakid)
+		command1.text = 'Rscript -e "args=commandArgs(TRUE);library(localshiny);installApp(args[1])" {0}'.format(pakid)
 
 	# generate third install-child-node reportable
 	rportable = SubElement(install, 'rportable')
 
-	winr = SubElement(rportable, 'Windows', attrib={'OSVersion': 'Windows10', 'RVersion': '4.0.4'})
+	winr = SubElement(rportable, 'Windows', attrib={'OSVersion': '', 'RVersion': ''})
 	winr_url = SubElement(winr, 'url')
-	winr_url.text = HOST + '/static/qtshiny/R-Windows-4.0.4.zip'
+	rtools64 = SubElement(winr, 'Rtools64')
+	rtools32 = SubElement(winr, 'Rtools32')
+	if is_v1_greater_than_v2(rversion, '4.0'):
+		winr_url.text = 'https://cloud.r-project.org/bin/windows/base/old/4.0.5/R-4.0.5-win.exe'
+		rtools64.text = "https://cran.r-project.org/bin/windows/Rtools/rtools40v2-x86_64.exe"
+		rtools32.text = "https://cran.r-project.org/bin/windows/Rtools/rtools40-i686.exe"
+	else:
+		winr_url.text = 'https://cloud.r-project.org/bin/windows/base/old/3.6.3/R-3.6.3-win.exe'
+		rtools64.text = "https://cran.r-project.org/bin/windows/Rtools/Rtools35.exe"
+		rtools32.text = "https://cran.r-project.org/bin/windows/Rtools/Rtools35.exe"
 
-	macr = SubElement(rportable, 'macOS', attrib={'OSVersion': '', 'RVersion': '4.0.4'})
+	macr = SubElement(rportable, 'macOS', attrib={'OSVersion': '', 'RVersion': ''})
 	macr_url = SubElement(macr, 'url')
-	macr_url.text = ''
+	if is_v1_greater_than_v2(rversion, '4.0'):
+		macr_url.text = 'https://cloud.r-project.org/bin/macosx/R-4.0.5.pkg'
+	else:
+		macr_url.text = 'https://cloud.r-project.org/bin/macosx/R-3.6.3.nn.pkg'
 
-	linuxr = SubElement(rportable, 'Linux', attrib={'OSVersion': '', 'RVersion': '4.0.4'})
+	linuxr = SubElement(rportable, 'Ubuntu', attrib={'OSVersion': '', 'RVersion': ''})
 	linuxr_url = SubElement(linuxr, 'url')
-	linuxr_url.text = ''
+	if is_v1_greater_than_v2(rversion, '4.0'):
+		linuxr_url.text = 'http://cloud.r-project.org/src/base/R-4/R-4.0.5.tar.gz'
+	else:
+		linuxr_url.text = 'http://cloud.r-project.org/src/base/R-3/R-3.6.3.tar.gz'
 
 	# generate third root-child-node run
 	run = SubElement(root, 'run')
@@ -102,6 +119,3 @@ def generate_xml(pakid, pakname, pakauthor, version, pakdesc, pakos, pakdate, up
 
 	# write out xml data
 	tree.write(UPLOAD_FOLDER + '/result.xml', encoding='utf-8', xml_declaration=True)
-
-
-generate_xml('1','1','1','1','1','1','1','1','1','1','1')

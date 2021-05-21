@@ -118,24 +118,40 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="input4">OS:</label>
-                            <label style="text-indent: 430px;">Arch:</label>
+                            <label for="input4">RVersion:</label>
                             <div class="input-group">
-                                <select name="pakos" id="input4" class="form-control" required style="margin-left: 0">
-                                    <option value="{{ pakos }}" selected hidden >{{ pakos }}</option>
-                                    <option value="Windows">Windows</option>
-                                    <option value="Linux">Linux</option>
-                                    <option value="macOS">macOS</option>
-                                    <option value="All">All</option>
-                                </select>
-                                <select name="arch" id="input5" class="form-control" required style="margin-left: 0">
-                                    <option value="{{ arch }}" selected hidden>{{ arch }}</option>
-                                    <option value="x86">x86</option>
-                                    <option value="x64">x64</option>
-                                    <option value="arm64">arm64</option>
-                                </select>
+                                <input type="text" name="rversion" class="form-control"
+                                       aria-describedby="validatedInputGroupPrepend"
+                                       id="input4" placeholder="required R version" value="{{ rversion }}" required style="margin-left: 0">
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label for="input5">RunCMD:</label>
+                            <div class="input-group">
+                                <input type="text" name="runcmd" class="form-control"
+                                       aria-describedby="validatedInputGroupPrepend"
+                                       id="input5" placeholder="run the package command" value="{{ runcmd }}" required style="margin-left: 0">
+                            </div>
+                        </div>
+{#                        <div class="mb-3">#}
+{#                            <label for="input4">OS:</label>#}
+{#                            <label style="text-indent: 430px;">Arch:</label>#}
+{#                            <div class="input-group">#}
+{#                                <select name="pakos" id="input4" class="form-control" required style="margin-left: 0">#}
+{#                                    <option value="{{ pakos }}" selected hidden >{{ pakos }}</option>#}
+{#                                    <option value="Windows">Windows</option>#}
+{#                                    <option value="Linux">Linux</option>#}
+{#                                    <option value="macOS">macOS</option>#}
+{#                                    <option value="All">All</option>#}
+{#                                </select>#}
+{#                                <select name="arch" id="input5" class="form-control" required style="margin-left: 0">#}
+{#                                    <option value="{{ arch }}" selected hidden>{{ arch }}</option>#}
+{#                                    <option value="x86">x86</option>#}
+{#                                    <option value="x64">x64</option>#}
+{#                                    <option value="arm64">arm64</option>#}
+{#                                </select>#}
+{#                            </div>#}
+{#                        </div>#}
                         <div class="mb-3">
                             <label for="validationTextarea">Description:</label>
                             <textarea class="form-control" rows="5" name="pakdesc" id="validationTextarea2"
