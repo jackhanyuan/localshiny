@@ -86,7 +86,7 @@ def generate_xml(pakid, pakname, pakauthor, version, pakdesc, pakos, pakdate, up
 	rtools32 = SubElement(winr, 'Rtools32')
 	if is_v1_greater_than_v2(rversion, '4.0'):
 		winr_url.text = 'https://cloud.r-project.org/bin/windows/base/old/4.0.5/R-4.0.5-win.exe'
-		rtools64.text = "https://cran.r-project.org/bin/windows/Rtools/rtools40v2-x86_64.exe"
+		rtools64.text = "https://cran.r-project.org/bin/windows/Rtools/rtools40-x86_64.exe"
 		rtools32.text = "https://cran.r-project.org/bin/windows/Rtools/rtools40-i686.exe"
 	else:
 		winr_url.text = 'https://cloud.r-project.org/bin/windows/base/old/3.6.3/R-3.6.3-win.exe'
