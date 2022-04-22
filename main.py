@@ -35,7 +35,7 @@ Session(app)
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static/package')
 TEMP_FOLDER = os.path.join(os.path.dirname(__file__), 'temp')
 ALLOWED_EXTENSIONS = set(['zip'])
-HOST = 'https://www.localshiny.org'
+HOST = 'https://localshiny.org'
 LIMIT_PACKAGES_NUMBER = 10
 
 
@@ -370,7 +370,7 @@ def upload():
             count_package = len(get_user_pakid(pakauthor))
             if get_pakid(pakname, pakauthor):
                 error = 'App name exists, please change it and try again.'
-            elif count_package > LIMIT_PACKAGES_NUMBER:
+            elif count_package >= LIMIT_PACKAGES_NUMBER:
                 error = 'You have more than {0} packages.'.format(LIMIT_PACKAGES_NUMBER)
             else:
                 # 获取文件名

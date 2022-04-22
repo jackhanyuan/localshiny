@@ -9,6 +9,9 @@ With the LocalShiny package, developers create clones of applications and share 
 
 [LocalShiny Documentation](https://localshiny.github.io/)
 
+[LocalShiny Github](https://github.com/localshiny)
+
+
 ## Required Environments
 
 - OS: Linux server (>= 18.04)
@@ -84,7 +87,7 @@ WTForms==2.3.3
 uwsgi==2.0.18
 ```
 
-> Use the command `pip install requirements.txt` to install them.
+> Use the command `pip install -r requirements.txt` to install them.
 
 [Install Nginx](http://nginx.org/en/linux_packages.html)
 
