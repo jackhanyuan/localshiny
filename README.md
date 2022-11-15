@@ -11,7 +11,6 @@ With the LocalShiny package, developers create clones of applications and share 
 
 [LocalShiny Github](https://github.com/localshiny)
 
-
 ## Required Environments
 
 - OS: Linux server (>= 18.04)
@@ -46,10 +45,12 @@ sudo vim ~/.bashrc
 ```
 
 > Add the following three lines in `~/.bashrc`.
-```
+
+```shell script
 VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
 export WORKON_HOME=$HOME/.virtualenvs
 source ~/.local/bin/virtualenvwrapper.sh
+# source /usr/local/bin/virtualenvwrapper.sh
 ```
 
 ```shell script
@@ -76,7 +77,8 @@ redis-cli
 Install other Python packages.
 
 > LocalShiny Web requires the following python packages.
-```
+
+```shell script
 email-validator==1.1.2
 Flask==1.1.2
 Flask-Session==0.3.2
@@ -85,9 +87,12 @@ redis==3.5.3
 Werkzeug==1.0.1
 WTForms==2.3.3
 uwsgi==2.0.18
+mod-wsgi==4.9.2
 ```
 
 > Use the command `pip install -r requirements.txt` to install them.
+
+### Nginx configuration (Ubuntu)
 
 [Install Nginx](http://nginx.org/en/linux_packages.html)
 
@@ -96,39 +101,92 @@ sudo apt update
 sudo apt install nginx
 ```
 
-### Nginx configuration
-
 Copy the SSL certificate to the Nginx directory.
 
 ```shell script
-cp -r cert /etc/nginx/cert
+cp -r deploy/nginx/cert /etc/nginx/cert
 ```
 
 Copy nginx.conf to the Nginx directory.
 
 ```shell script
-cp nginx.conf /etc/nginx/
+cp deploy/nginx/nginx.conf /etc/nginx/localshiny.conf
 ```
-
-### Firewall settings
-
-```shell script
-sudo ufw app list
-sudo ufw allow 'Nginx Full' # allow 80 and 443 port
-```
-
-### Start LocalShiny Web
 
 Start uwsgi
 
 ```shell script
+cp deploy/nginx/uwsgi.ini ./
 uwsgi --ini uwsgi.ini
 ```
 
 Start Nginx service
 
 ```shell script
-sudo service nginx restart
+sudo service nginx start
+```
+
+Firewall settings
+
+```shell script
+sudo ufw app list
+sudo ufw allow 'Nginx Full' # allow 80 and 443 port
+```
+
+Now, you can visit `www.localshiny.org` in your browser.
+
+### Apache httpd configuration (CentOS)
+
+[Install Apache httpd](https://httpd.apache.org/docs/2.4/install.html)
+
+```shell script
+sudo yum install httpd
+sudo systemctl enable httpd
+sudo systemctl start httpd
+```
+
+Copy the SSL certificate to the httpd directory.
+
+```shell script
+cp -r cert/apache /etc/httpd/cert
+```
+
+Copy apache.conf to the httpd directory.
+
+```shell script
+cp deploy/apache/apache.conf /etc/httpd/conf.d/localshiny.conf
+```
+
+Install mod_wsgi
+
+```shell script
+sudo ~/.virtualenvs/localshiny/bin/mod_wsgi-express install-module # Execute the command and copy the output
+# LoadModule wsgi_module "/usr/lib64/httpd/modules/mod_wsgi-py36.cpython-36m-x86_64-linux-gnu.so"
+# WSGIPythonHome "/home/centos/.virtualenvs/localshiny"
+vim /etc/httpd/conf.d/localshiny.conf
+# modify conf to load wsgi_module
+# LoadModule wsgi_module "/usr/lib64/httpd/modules/mod_wsgi-py36.cpython-36m-x86_64-linux-gnu.so"
+```
+
+Copy app.wsgi to the LocalShinyWeb directory.
+
+```shell script
+cp deploy/apache/app.wsgi ./
+```
+
+Start Apache httpd service
+
+```shell script
+sudo systemctl start httpd
+```
+
+Firewall settings
+
+```shell script
+sudo firewall-cmd --zone=public --list-ports
+sudo firewall-cmd --zone=public --add-port=80/tcp --permanent
+sudo firewall-cmd --zone=public --add-port=443/tcp --permanent
+sudo firewall-cmd --reload
 ```
 
 Now, you can visit `www.localshiny.org` in your browser.
@@ -140,8 +198,9 @@ Now, you can visit `www.localshiny.org` in your browser.
 - LocalShinyWeb directory: `/var/www/localshiny.org/LocalShinyWeb`
 - SSL file: `LocalShinyWeb/cert`
 - logs: `LocalShinyWeb/logs`
-- uwsgi configuration file: `LocalShinyWeb/uwsgi.ini`
+- deploy configuration file: `LocalShinyWeb/deploy`
 - Nginx configuration file: `/etc/nginx`
+- Apache configuration file: `/etc/httpd`
 
 ### About uwsgi
 
@@ -156,18 +215,25 @@ sudo pkill -f uwsgi -9 # force kill uwsgi
 ### About Nginx
 
 ```shell script
-sudo nginx -t # check nginx.conf syntax errors
-sudo nginx # start nginx
-sudo nginx -s reload # reload nginx.conf
+sudo service nginx start  # start nginx service 
+sudo service nginx status  # check nginx service status
+sudo service nginx stop  # stop nginx service
+sudo service nginx restart  # restart nginx service
+
+sudo nginx -t  # check nginx.conf syntax errors
+sudo nginx  # start nginx
+sudo nginx -s reload  # reload nginx.conf
 ```
 
-### About Nginx service
+### About Apache
 
 ```shell script
-sudo service nginx start # start nginx service 
-sudo service nginx status # check nginx service status
-sudo service nginx stop # stop nginx service
-sudo service nginx restart # restart nginx service
+sudo systemctl start httpd  # start httpd service 
+sudo systemctl status httpd  # check httpd service status
+sudo systemctl enable httpd  # Auto-start
+sudo systemctl stop httpd  # stop httpd service 
+sudo systemctl restart httpd  # restart httpd service 
+sudo systemctl reload httpd  # reload apache.conf
 ```
 
 ---

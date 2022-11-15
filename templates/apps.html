@@ -67,11 +67,11 @@
                 <span>{{ package_dict[pak_id].pakname }}</span>
                 <span id="URL_{{ pak_id }}" style="display:none;">{{ package_dict[pak_id].fileurl }}</span>
                 {% if package_dict[pak_id].pakstatus == 'notinstall' %}
-                    <button class='myButton2' name='copylink' id={{host}}{{ package_dict[pak_id].fileurl }} onclick="copyURL({{ pak_id }},{{ ua_tag }})">Install</button>
+                    <button class='myButton2' style="background-color: #254577;" name='copylink' id={{host}}{{ package_dict[pak_id].fileurl }} onclick="copyURL({{ pak_id }},{{ ua_tag }})">Install</button>
                 {% elif package_dict[pak_id].pakstatus == 'upgradeable' %}
-                    <button name='copylink' class='myButton2' id={{host}}{{ package_dict[pak_id].fileurl }} onclick="copyURL({{ pak_id }},{{ ua_tag }})">Update</button>
+                    <button class='myButton2' style="background-color: #b92b27;" name='copylink' id={{host}}{{ package_dict[pak_id].fileurl }} onclick="copyURL({{ pak_id }},{{ ua_tag }})">Update</button>
                 {% elif package_dict[pak_id].pakstatus == 'installed' %}
-                    <button name='copylink' class='myButton2' id={{host}}{{ package_dict[pak_id].fileurl }}>Installed</button>
+                    <button class='myButton2' style="background-color: #373b44;" name='copylink' id={{host}}{{ package_dict[pak_id].fileurl }}>Installed</button>
                 {% endif %}
             </h1>
             <h2 class="list-meta" style="font-size: 1em;">
@@ -83,19 +83,11 @@
             <div class="list-meta" style="border-bottom: 1px solid #ddd">
 {#                <span>{{ package_dict[pak_id].pakos }}_{{ package_dict[pak_id].arch }} URL:</span>#}
 {#                <span id="URL_{{ pak_id }}">{{ package_dict[pak_id].fileurl }}</span>#}
-{#                {% if package_dict[pak_id].pakstatus == 'notinstall' %}#}
-{#                <button class='myButton2' name='copylink' id={{host}}{{ package_dict[pak_id].fileurl }} onclick="copyURL({{ pak_id }},{{ ua_tag }})">Install</button>#}
-{#                {% elif package_dict[pak_id].pakstatus == 'upgradeable' %}#}
-{#                <button name='copylink' class='myButton2' id={{host}}{{ package_dict[pak_id].fileurl }} onclick="copyURL({{ pak_id }},{{ ua_tag }})">Update</button>#}
-{#                {% elif package_dict[pak_id].pakstatus == 'installed' %}#}
-{#                <button name='copylink' class='myButton2' id={{host}}{{ package_dict[pak_id].fileurl }}>Installed</button>#}
-{#                {% endif %}#}
             </div>
             <div class="summary">
-{#                <p>{{ package_dict[pak_id].pakdesc[0:220] }}</p>#}
                 <p>{{ package_dict[pak_id].pakdesc }}</p>
             </div>
-            {#                    <span class="book-number">{{ pak_id }}</span>#}
+{#            <span class="book-number">{{ pak_id }}</span>#}
         </section>
         {% endfor %}
     </div>

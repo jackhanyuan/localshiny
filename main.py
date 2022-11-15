@@ -35,7 +35,7 @@ Session(app)
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static/package')
 TEMP_FOLDER = os.path.join(os.path.dirname(__file__), 'temp')
 ALLOWED_EXTENSIONS = set(['zip'])
-HOST = 'https://localshiny.org'
+HOST = 'https://www.localshiny.org'
 LIMIT_PACKAGES_NUMBER = 10
 
 
@@ -47,7 +47,7 @@ my_package_dict = {}
 # tus文件断点续传
 # upload_url: 客户端利用TUS协议上传的URL，客户端的TUS指向这个URL
 # upload_folder: 存储上传文件的临时目录
-tus_manager(app, upload_url='/file-upload', upload_folder='temp')
+tus_manager(app, upload_url='/file-upload', upload_folder=TEMP_FOLDER)
 
 
 # 初始化所有app，以及已登录用户的所有app信息

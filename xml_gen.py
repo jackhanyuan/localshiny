@@ -85,8 +85,8 @@ def generate_xml(pakid, pakname, pakauthor, version, pakdesc, pakos, pakdate, up
 	rtools64 = SubElement(winr, 'Rtools64')
 	rtools32 = SubElement(winr, 'Rtools32')
 	if is_v1_greater_than_v2(rversion, '4.0'):
-		winr_url.text = 'https://cloud.r-project.org/bin/windows/base/old/4.0.5/R-4.0.5-win.exe'
-		rtools64.text = "https://cran.r-project.org/bin/windows/Rtools/rtools40-x86_64.exe"
+		winr_url.text = 'https://cloud.r-project.org/bin/windows/base/old/4.2.1/R-4.2.1-win.exe'
+		rtools64.text = "https://cloud.r-project.org/bin/windows/Rtools/rtools42/files/rtools42-5355-5357.exe"
 		rtools32.text = "https://cran.r-project.org/bin/windows/Rtools/rtools40-i686.exe"
 	else:
 		winr_url.text = 'https://cloud.r-project.org/bin/windows/base/old/3.6.3/R-3.6.3-win.exe'
@@ -96,14 +96,14 @@ def generate_xml(pakid, pakname, pakauthor, version, pakdesc, pakos, pakdate, up
 	macr = SubElement(rportable, 'macOS', attrib={'OSVersion': '', 'RVersion': ''})
 	macr_url = SubElement(macr, 'url')
 	if is_v1_greater_than_v2(rversion, '4.0'):
-		macr_url.text = 'https://cloud.r-project.org/bin/macosx/R-4.0.5.pkg'
+		macr_url.text = 'https://cloud.r-project.org/bin/macosx/base/R-4.2.1.pkg'
 	else:
 		macr_url.text = 'https://cloud.r-project.org/bin/macosx/R-3.6.3.nn.pkg'
 
 	linuxr = SubElement(rportable, 'Ubuntu', attrib={'OSVersion': '', 'RVersion': ''})
 	linuxr_url = SubElement(linuxr, 'url')
 	if is_v1_greater_than_v2(rversion, '4.0'):
-		linuxr_url.text = 'http://cloud.r-project.org/src/base/R-4/R-4.0.5.tar.gz'
+		linuxr_url.text = 'http://cloud.r-project.org/src/base/R-4/R-4.2.1.tar.gz'
 	else:
 		linuxr_url.text = 'http://cloud.r-project.org/src/base/R-3/R-3.6.3.tar.gz'
 
