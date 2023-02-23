@@ -105,6 +105,39 @@ def init_apps(installed_apps):
         return str(e)
 
 
+def is_localshiny_request():
+    ua_str = str(request.user_agent)
+    if 'LocalShiny' in ua_str:
+        return True
+    return False
+
+
+def get_installed_apps():
+    ua_tag = 0
+    installed_apps = {}
+    if is_localshiny_request():
+        # ua_str = 'LocalShiny/qy59BctD-1.0.0,ZfEKirv7-0.99,'
+        ua_str = str(request.user_agent)
+        ua_tag = 1
+        ls = ua_str.split(' ')[-1]
+        apps = ls.split('/')[-1].split(',')
+        apps = list(filter(None, set(apps)))  # 去重去空
+        ua_tag = 1
+        for app in apps:
+            pid, version = app.split('-')
+            installed_apps[pid] = version
+
+    return ua_tag, installed_apps
+
+
+@app.before_request
+def before_request():
+    session['myspace'] = None
+    if is_localshiny_request():
+        session['myspace'] = True
+    # print(is_localshiny_request(), session['myspace'])
+
+
 # Home页面相关
 @app.route('/')
 @app.route('/index')
@@ -127,20 +160,8 @@ def doc():
 # RShinyApps页面相关
 @app.route('/apps')
 def apps():
-    # 获取installed_apps
-    # ua_str = 'LocalShiny/qy59BctD-1.0.0,ZfEKirv7-0.99,'
-    ua_str = str(request.user_agent)
-    ua_tag = 0
-    installed_apps = {}
-    if 'LocalShiny' in ua_str:
-        ls = ua_str.split(' ')[-1]
-        apps = ls.split('/')[-1].split(',')
-        apps = list(filter(None, set(apps)))  # 去重去空
-        ua_tag = 1
-        for app in apps:
-            pid, version = app.split('-')
-            installed_apps[pid] = version
-
+    # 获取已安装app信息
+    ua_tag, installed_apps = get_installed_apps()
     # 先初始化所有app的信息，参数传给apps.html，再渲染页面
     init_apps(installed_apps)
     return render_template('apps.html', package_dict=package_dict, host = HOST, ua_tag = ua_tag)
@@ -149,20 +170,8 @@ def apps():
 # 用户app页面相关
 @app.route('/myapps')
 def myapps():
-    # 获取installed_apps
-    # ua_str = 'LocalShiny/qy59BctD-1.0.0,ZfEKirv7-1.2,'
-    ua_str = str(request.user_agent)
-    ua_tag = 0
-    installed_apps = {}
-    if 'LocalShiny' in ua_str:
-        ls = ua_str.split(' ')[-1]
-        apps = ls.split('/')[-1].split(',')
-        apps = list(filter(None, set(apps)))  # 去重去空
-        ua_tag = 1
-        for app in apps:
-            pid, version = app.split('-')
-            installed_apps[pid] = version
-
+    # 获取已安装app信息
+    ua_tag, installed_apps = get_installed_apps()
     # 先初始化已登录用户所有app的信息，参数传给myapps.html，再渲染页面
     init_apps(installed_apps)
     # print(my_package_dict)
@@ -182,7 +191,6 @@ def register():
     try:
         # 存储错误信息
         error = None
-
         # 获取客户端提交的form注册表单
         form = RegistrationForm(request.form)
         # POST请求，且form注册表单验证通过，合法
@@ -321,6 +329,8 @@ def api_login():
 def logout():
     # 删除session中所有的值(默认更改为None）
     session.clear()
+    # session.pop('logged_in', None)
+    # session.pop('username', None)
     # 返回到Home页面
     return redirect('/')
 
@@ -330,8 +340,6 @@ def api_logout():
     username = str(session.get('username'))
     if session.get('logged_in'):
         # 退出登陆，删除session变量值
-        # session.pop('logged_in', None)
-        # session.pop('username', None)
         update_token(username)
         session.clear()
         return (jsonify({'result': 1,'description': username + ' logout successful.'}), 200)
