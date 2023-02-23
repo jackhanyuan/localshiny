@@ -79,15 +79,15 @@ Install other Python packages.
 > LocalShiny Web requires the following python packages.
 
 ```shell script
-email-validator==1.1.2
-Flask==1.1.2
-Flask-Session==0.3.2
-passlib==1.7.4
-redis==3.5.3
-Werkzeug==1.0.1
-WTForms==2.3.3
-uwsgi==2.0.18
-mod-wsgi==4.9.2
+email-validator>=1.1.2
+Flask>=1.1.2
+Flask-Session>=0.3.2
+passlib>=1.7.4
+redis>=3.5.3
+Werkzeug>=1.0.1
+WTForms>=2.3.3
+uwsgi>=2.0.18
+mod-wsgi>=4.9.2
 ```
 
 > Use the command `pip install -r requirements.txt` to install them.
