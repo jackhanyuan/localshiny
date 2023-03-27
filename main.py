@@ -556,6 +556,33 @@ def api_get_xml(pakid):
         return resp
 
 
+@app.route('/api/package/gen-xml', methods = ['POST'])
+def api_gen_xml():
+    try:
+        pakinfo = eval(request.form.to_dict()['info'])
+        pakname = pakinfo['pakname']
+        pakauthor = pakinfo['authorname']
+        version = pakinfo['version']
+        pakdesc = pakinfo['pakdesc']
+        pakos = pakinfo['os']
+        arch = 'script'
+        distribution = 'None'
+        pakdate = datetime.now().strftime('%Y-%m-%d')
+        upmethod = 'api'
+        rversion = pakinfo['rversion']
+        runcmd = pakinfo['runcmd']
+        pakid = generate_short_id()
+        fileurl = ''
+        generate_xml(pakid, pakname, pakauthor, version, pakdesc, pakos, pakdate, upmethod, rversion, runcmd, fileurl)
+        xmlname = pakid + '.xml'
+        return send_from_directory(UPLOAD_FOLDER, 'result.xml', attachment_filename= xmlname, as_attachment=True)
+    except Exception as error:
+        # abort(404)
+        resp = jsonify({'result': 0, 'description' : 'error'})
+        resp.status_code = 404
+        return resp
+
+
 # 已登录用户更新app相关
 # pakname：要更新app的pakname
 @app.route('/update/<pakid>', methods=['POST', 'GET'])
