@@ -340,7 +340,7 @@ def api_logout():
     username = str(session.get('username'))
     if session.get('logged_in'):
         # 退出登陆，删除session变量值
-        update_token(username)
+        # update_token(username)
         session.clear()
         return (jsonify({'result': 1,'description': username + ' logout successful.'}), 200)
     else:
